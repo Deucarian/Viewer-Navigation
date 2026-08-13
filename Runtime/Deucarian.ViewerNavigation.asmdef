@@ -1,0 +1,26 @@
+{
+  "name": "Deucarian.ViewerNavigation",
+  "rootNamespace": "Deucarian.ViewerNavigation",
+  "references": [
+    "Deucarian.CameraNavigation",
+    "Deucarian.CameraNavigation.InputSystemIntegration",
+    "Deucarian.Common",
+    "Deucarian.Diagnostics",
+    "Deucarian.Logging",
+    "Deucarian.PointerCapture",
+    "Deucarian.Theming",
+    "Deucarian.UI",
+    "Unity.InputSystem",
+    "UnityEngine.UI",
+    "UnityEngine.UIElementsModule"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

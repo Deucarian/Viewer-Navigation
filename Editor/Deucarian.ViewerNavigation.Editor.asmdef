@@ -1,0 +1,19 @@
+{
+  "name": "Deucarian.ViewerNavigation.Editor",
+  "rootNamespace": "Deucarian.ViewerNavigation.Editor",
+  "references": [
+    "Deucarian.Editor",
+    "Deucarian.ViewerNavigation"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

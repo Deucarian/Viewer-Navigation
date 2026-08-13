@@ -1,0 +1,40 @@
+{
+  "packageId": "com.deucarian.viewer-navigation",
+  "displayName": "Deucarian Viewer Navigation",
+  "samplePolicy": "compiled-example",
+  "operationalPackage": true,
+  "ownedCapabilities": [
+    "viewer-navigation-experience"
+  ],
+  "runtimeAssemblies": [
+    "Deucarian.ViewerNavigation"
+  ],
+  "editorAssemblies": [
+    "Deucarian.ViewerNavigation.Editor"
+  ],
+  "sampleAssemblies": [
+    "Deucarian.ViewerNavigation.Samples.Bootstrap"
+  ],
+  "testAssemblies": [
+    "Deucarian.ViewerNavigation.Tests.EditMode",
+    "Deucarian.ViewerNavigation.Tests.PlayMode"
+  ],
+  "requiredDependencies": [
+    "com.deucarian.camera-navigation",
+    "com.deucarian.camera-navigation.input-system-integration",
+    "com.deucarian.common",
+    "com.deucarian.diagnostics",
+    "com.deucarian.editor",
+    "com.deucarian.logging",
+    "com.deucarian.pointer-capture",
+    "com.deucarian.theming",
+    "com.deucarian.ui",
+    "com.unity.inputsystem",
+    "com.unity.modules.uielements",
+    "com.unity.ugui"
+  ],
+  "optionalVersionDefinedDependencies": [],
+  "allowedDirectDebugCalls": [],
+  "allowedDirectUnityObjectLifetimeCalls": [],
+  "expectedSamplesRoot": "Samples~"
+}

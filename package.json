@@ -1,0 +1,44 @@
+{
+  "name": "com.deucarian.viewer-navigation",
+  "version": "0.1.0",
+  "displayName": "Deucarian Viewer Navigation",
+  "description": "Reusable viewer navigation experience composing camera navigation, Input System controls, pointer capture, UI, theming, logging, and diagnostics.",
+  "unity": "2022.3",
+  "author": {
+    "name": "Deucarian"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deucarian/Viewer-Navigation.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "deucarian",
+    "viewer",
+    "navigation",
+    "view-cube",
+    "orbit",
+    "fly"
+  ],
+  "dependencies": {
+    "com.deucarian.camera-navigation": "0.2.10",
+    "com.deucarian.camera-navigation.input-system-integration": "0.1.5",
+    "com.deucarian.common": "0.2.1",
+    "com.deucarian.diagnostics": "0.1.4",
+    "com.deucarian.editor": "1.0.5",
+    "com.deucarian.logging": "1.0.2",
+    "com.deucarian.pointer-capture": "0.1.2",
+    "com.deucarian.theming": "1.0.3",
+    "com.deucarian.ui": "0.2.1",
+    "com.unity.inputsystem": "1.17.0",
+    "com.unity.ugui": "1.0.0",
+    "com.unity.modules.uielements": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Viewer Navigation Bootstrap",
+      "description": "Explicit composition-root example with a reference model, toolbar, and six-face view cube.",
+      "path": "Samples~/Viewer Navigation Bootstrap"
+    }
+  ]
+}

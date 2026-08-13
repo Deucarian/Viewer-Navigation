@@ -1,0 +1,16 @@
+{
+  "name": "Deucarian.ViewerNavigation.Samples.Bootstrap",
+  "rootNamespace": "Deucarian.ViewerNavigation.Samples",
+  "references": [
+    "Deucarian.ViewerNavigation"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
