@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 - 2026-08-14
+
+- Added the canonical reference-viewer navigation preset using the tuning proven by
+  Report Viewer for Orbit, Fly, framing, transitions, toolbar, and view cube.
+- Made the settings-based installer resolve that preset when a consumer does not
+  provide an intentional override, so Report Viewer, Activity Viewer, and new viewer
+  templates share one default experience rather than parallel local defaults.
+
 ## 0.1.1 - 2026-08-14
 
 - Coordinated configured drag actions with the Pointer Capture Requested, Active,

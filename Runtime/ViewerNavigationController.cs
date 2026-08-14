@@ -58,17 +58,45 @@ namespace Deucarian.ViewerNavigation
             ViewerNavigationSettings configuration,
             IViewerNavigationInputBlocker inputBlocker = null,
             IDeucarianFramingBoundsStrategy<GameObject>
-                navigationReferenceBoundsStrategy = null)
+                navigationReferenceBoundsStrategy = null,
+            IViewerNavigationAnimationPolicy animationPolicy = null)
         {
             settings = configuration;
+            IViewerNavigationMotionProfile motionProfile = configuration;
+            if (motionProfile != null && animationPolicy != null)
+            {
+                motionProfile = new PolicyAwareViewerNavigationMotionProfile(
+                    motionProfile,
+                    animationPolicy);
+            }
+
             Initialize(
                 camera,
-                configuration != null ? configuration.Controls : null,
+                ResolveControls(configuration),
                 configuration != null ? configuration.InputSettings : null,
-                configuration,
-                configuration != null ? configuration.FramingSettings : null,
+                motionProfile,
+                ResolveFramingSettings(configuration),
                 inputBlocker,
                 navigationReferenceBoundsStrategy);
+            settings = configuration;
+        }
+
+        private static DeucarianCameraNavigationControls ResolveControls(
+            ViewerNavigationSettings configuration)
+        {
+            return configuration != null && configuration.Controls != null
+                ? configuration.Controls
+                : Resources.Load<DeucarianCameraNavigationControls>(
+                    DeucarianCameraNavigationControls.CanonicalResourcesPath);
+        }
+
+        private static IDeucarianCameraFramingSettings ResolveFramingSettings(
+            ViewerNavigationSettings configuration)
+        {
+            return configuration != null && configuration.FramingSettings != null
+                ? configuration.FramingSettings
+                : Resources.Load<DeucarianCameraFramingSettings>(
+                    DeucarianCameraFramingSettings.CanonicalResourcesPath);
         }
 
         public void Initialize(

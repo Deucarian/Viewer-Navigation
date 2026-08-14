@@ -22,7 +22,8 @@ namespace Deucarian.ViewerNavigation
             ViewerNavigationSettings configuration = null,
             IViewerNavigationInputBlocker inputBlocker = null,
             IDeucarianFramingBoundsStrategy<GameObject>
-                referenceBoundsStrategy = null)
+                referenceBoundsStrategy = null,
+            IViewerNavigationAnimationPolicy animationPolicy = null)
         {
             ViewerNavigationInstaller installer = FindUnder(parent);
             if (installer == null)
@@ -40,7 +41,8 @@ namespace Deucarian.ViewerNavigation
                 camera,
                 configuration,
                 inputBlocker,
-                referenceBoundsStrategy);
+                referenceBoundsStrategy,
+                animationPolicy);
             return installer;
         }
 
@@ -83,21 +85,21 @@ namespace Deucarian.ViewerNavigation
             ViewerNavigationSettings configuration,
             IViewerNavigationInputBlocker inputBlocker = null,
             IDeucarianFramingBoundsStrategy<GameObject>
-                referenceBoundsStrategy = null)
+                referenceBoundsStrategy = null,
+            IViewerNavigationAnimationPolicy animationPolicy = null)
         {
-            settings = configuration;
+            settings = configuration != null
+                ? configuration
+                : ViewerNavigationSettings.LoadReferencePreset();
             navigationCamera = camera;
             EnsureComponents();
             Controller.Initialize(
                 camera,
-                ResolveControls(configuration != null ? configuration.Controls : null),
-                configuration != null ? configuration.InputSettings : null,
-                configuration,
-                ResolveFramingSettings(
-                    configuration != null ? configuration.FramingSettings : null),
+                settings,
                 inputBlocker,
-                referenceBoundsStrategy);
-            Toolbar.Initialize(Controller, configuration);
+                referenceBoundsStrategy,
+                animationPolicy);
+            Toolbar.Initialize(Controller, settings);
         }
 
         public void Initialize(

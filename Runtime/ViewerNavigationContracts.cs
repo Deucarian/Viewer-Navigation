@@ -44,6 +44,11 @@ namespace Deucarian.ViewerNavigation
         float EvaluateRotation(float normalizedTime);
     }
 
+    public interface IViewerNavigationAnimationPolicy
+    {
+        bool ShouldAnimate { get; }
+    }
+
     public readonly struct ViewerNavigationSnapshot : IEquatable<ViewerNavigationSnapshot>
     {
         public ViewerNavigationSnapshot(

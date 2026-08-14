@@ -11,6 +11,8 @@ namespace Deucarian.ViewerNavigation
         ScriptableObject,
         IViewerNavigationMotionProfile
     {
+        public const string ReferencePresetResourcesPath =
+            "Deucarian/ViewerNavigationReferencePreset";
         public const float DefaultTransitionSpeed = 20f;
         public const float DefaultMinimumTransitionDuration = 0.1f;
         public const float DefaultMaximumTransitionDuration = 1.25f;
@@ -54,6 +56,12 @@ namespace Deucarian.ViewerNavigation
         public float ReferencePadding => Mathf.Max(1f, referencePadding);
         public bool ShowToolbar => showToolbar;
         public bool ShowViewCube => showViewCube;
+
+        public static ViewerNavigationSettings LoadReferencePreset()
+        {
+            return Resources.Load<ViewerNavigationSettings>(
+                ReferencePresetResourcesPath);
+        }
 
         public float CalculateTransitionDuration(float distance)
         {
@@ -118,5 +126,44 @@ namespace Deucarian.ViewerNavigation
 
         public float EvaluateRotation(float normalizedTime) =>
             Mathf.Clamp01(normalizedTime);
+    }
+
+    internal sealed class PolicyAwareViewerNavigationMotionProfile :
+        IViewerNavigationMotionProfile
+    {
+        private readonly IViewerNavigationMotionProfile profile;
+        private readonly IViewerNavigationAnimationPolicy policy;
+
+        public PolicyAwareViewerNavigationMotionProfile(
+            IViewerNavigationMotionProfile motionProfile,
+            IViewerNavigationAnimationPolicy animationPolicy)
+        {
+            profile = motionProfile;
+            policy = animationPolicy;
+        }
+
+        public bool AnimateTransitions =>
+            profile != null &&
+            profile.AnimateTransitions &&
+            (policy == null || policy.ShouldAnimate);
+
+        public float TransitionMatchFieldOfView => profile != null
+            ? profile.TransitionMatchFieldOfView
+            : ViewerNavigationSettings.DefaultTransitionMatchFieldOfView;
+
+        public float CalculateTransitionDuration(float distance) =>
+            AnimateTransitions && profile != null
+                ? profile.CalculateTransitionDuration(distance)
+                : 0f;
+
+        public float EvaluateMovement(float normalizedTime) =>
+            profile != null
+                ? profile.EvaluateMovement(normalizedTime)
+                : Mathf.Clamp01(normalizedTime);
+
+        public float EvaluateRotation(float normalizedTime) =>
+            profile != null
+                ? profile.EvaluateRotation(normalizedTime)
+                : Mathf.Clamp01(normalizedTime);
     }
 }

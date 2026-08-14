@@ -4,7 +4,7 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.1`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.2`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -32,6 +32,9 @@ navigation.RegisterReference(loadedModelRoot, frame: true, captureOrigin: true);
 ```
 
 The overload taking `ViewerNavigationSettings` is useful for scene-authored projects.
+Passing `null` selects the packaged canonical reference preset, whose navigation and
+framing tuning is the Report Viewer-proven default. Supply another settings asset only
+for an intentional product variation.
 The dependency-explicit overload above is preferred for application composition roots
 because each policy can be supplied and tested independently. Reinitializing an
 installer is supported; it detaches old event subscriptions and cancels active camera
@@ -44,6 +47,8 @@ transitions before applying the replacement dependencies.
   top-down state, reference bounds, origin, and active transition state.
 - `ViewerNavigationSnapshot` is the immutable state notification contract.
 - `IViewerNavigationMotionProfile` supplies application-specific timing and easing.
+- `IViewerNavigationAnimationPolicy` lets a host gate the shared motion preset for an
+  accessibility preference without forking its timing or curves.
 - `IViewerNavigationInputBlocker` lets a host block input without coupling this package
   to application UI.
 - `IDeucarianFramingBoundsStrategy<GameObject>` lets a host preserve its proven
