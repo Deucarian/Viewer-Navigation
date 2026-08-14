@@ -77,7 +77,14 @@ namespace Deucarian.ViewerNavigation
             settings = configuration;
             navigationCamera = camera;
             EnsureComponents();
-            Controller.Initialize(camera, configuration, inputBlocker);
+            Controller.Initialize(
+                camera,
+                ResolveControls(configuration != null ? configuration.Controls : null),
+                configuration != null ? configuration.InputSettings : null,
+                configuration,
+                ResolveFramingSettings(
+                    configuration != null ? configuration.FramingSettings : null),
+                inputBlocker);
             Toolbar.Initialize(Controller, configuration);
         }
 
@@ -94,10 +101,10 @@ namespace Deucarian.ViewerNavigation
             EnsureComponents();
             Controller.Initialize(
                 camera,
-                controls,
+                ResolveControls(controls),
                 inputSettings,
                 motionProfile,
-                framingSettings,
+                ResolveFramingSettings(framingSettings),
                 inputBlocker);
             Toolbar.Initialize(Controller, settings);
         }
@@ -136,6 +143,22 @@ namespace Deucarian.ViewerNavigation
             return parent != null
                 ? parent.GetComponentInChildren<ViewerNavigationInstaller>(true)
                 : null;
+        }
+
+        private static DeucarianCameraNavigationControls ResolveControls(
+            DeucarianCameraNavigationControls configured)
+        {
+            return configured != null
+                ? configured
+                : Resources.Load<DeucarianCameraNavigationControls>(
+                    DeucarianCameraNavigationControls.CanonicalResourcesPath);
+        }
+
+        private static IDeucarianCameraFramingSettings ResolveFramingSettings(
+            IDeucarianCameraFramingSettings configured)
+        {
+            return configured ?? Resources.Load<DeucarianCameraFramingSettings>(
+                DeucarianCameraFramingSettings.CanonicalResourcesPath);
         }
     }
 }

@@ -29,7 +29,6 @@
     "com.deucarian.pointer-capture",
     "com.deucarian.theming",
     "com.deucarian.ui",
-    "com.unity.inputsystem",
     "com.unity.modules.uielements",
     "com.unity.ugui"
   ],

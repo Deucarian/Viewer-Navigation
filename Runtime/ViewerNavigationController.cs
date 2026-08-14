@@ -179,7 +179,9 @@ namespace Deucarian.ViewerNavigation
 
         private void ConfigureRuntimeComponents()
         {
-            interactionGate.Configure(externalInputBlocker);
+            interactionGate.Configure(
+                externalInputBlocker,
+                navigationRig.ActionStateSource);
             navigationRig.NavigationCamera = navigationCamera;
             navigationRig.Controls = controls;
             navigationRig.InputSettings = inputSettings;

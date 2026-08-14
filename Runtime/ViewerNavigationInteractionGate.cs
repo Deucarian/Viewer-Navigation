@@ -4,8 +4,6 @@ using Deucarian.CameraNavigation.InputSystemIntegration;
 using Deucarian.PointerCapture;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 using UnityEngine.UIElements;
 
 namespace Deucarian.ViewerNavigation
@@ -20,6 +18,7 @@ namespace Deucarian.ViewerNavigation
         private readonly List<VisualElement> uiRoots = new List<VisualElement>();
         private DeucarianPointerCaptureController pointerCapture;
         private IViewerNavigationInputBlocker externalBlocker;
+        private IDeucarianNavigationActionStateSource actionStateSource;
         private ViewerNavigationMode mode;
         private bool isTopDown;
         private DeucarianMouseButton capturedButton;
@@ -33,6 +32,14 @@ namespace Deucarian.ViewerNavigation
         public void Configure(IViewerNavigationInputBlocker blocker)
         {
             externalBlocker = blocker;
+        }
+
+        public void Configure(
+            IViewerNavigationInputBlocker blocker,
+            IDeucarianNavigationActionStateSource navigationActionStateSource)
+        {
+            externalBlocker = blocker;
+            actionStateSource = navigationActionStateSource;
         }
 
         public void SetNavigationState(ViewerNavigationMode navigationMode, bool topDown)
@@ -64,7 +71,8 @@ namespace Deucarian.ViewerNavigation
                 return true;
             }
 
-            if (isTopDown && Mouse.current != null && Mouse.current.leftButton.isPressed)
+            if (isTopDown && actionStateSource != null &&
+                actionStateSource.IsOrbitRotatePressed())
             {
                 return true;
             }
@@ -130,36 +138,52 @@ namespace Deucarian.ViewerNavigation
 
         private void Update()
         {
-            DeucarianPointerCaptureController capture = ResolvePointerCapture();
-            Mouse mouse = Mouse.current;
-            Keyboard keyboard = Keyboard.current;
-            bool neutral = IsInputNeutral(mouse, keyboard);
-            bool hasNewAction = HasNewNavigationAction(mouse, keyboard);
-            capture.UpdateInputRearming(neutral, hasNewAction);
+            ProcessInputState();
+        }
 
-            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
+        public void ProcessInputState()
+        {
+            DeucarianPointerCaptureController capture = ResolvePointerCapture();
+            if (actionStateSource == null)
+            {
+                capture.UpdateInputRearming(true, false);
+                return;
+            }
+
+            DeucarianNavigationActionState actionState =
+                actionStateSource.ReadActionState(
+                    isTopDown || mode == ViewerNavigationMode.Orbit
+                        ? DeucarianInputSystemNavigationMode.Orbit
+                        : DeucarianInputSystemNavigationMode.Fly,
+                    isTopDown);
+            capture.UpdateInputRearming(
+                actionState.IsNeutral,
+                actionState.HasNewNavigationAction);
+
+            if (actionState.EscapePressed)
             {
                 capture.NotifyEscapePressed();
                 ResetCapture();
                 return;
             }
 
-            if (hasNewAction && !IsCurrentActionBlocked(mouse))
+            if (HasAllowedNavigationAction(actionState))
             {
                 NavigationInputStarted?.Invoke();
             }
 
-            if (ownsCapture && !IsButtonPressed(mouse, capturedButton))
+            if (ownsCapture &&
+                !actionStateSource.IsButtonPressed(capturedButton))
             {
                 ReleaseCapture();
             }
 
-            if (!ownsCapture && TryGetCaptureButton(mouse, out DeucarianMouseButton button))
+            if (!ownsCapture && actionState.CaptureRequested)
             {
-                Vector2 position = mouse != null ? mouse.position.ReadValue() : Vector2.zero;
-                if (!IsPointerInputBlocked(position) && capture.RequestCapture(this))
+                if (!IsPointerInputBlocked(actionState.PointerPosition) &&
+                    capture.RequestCapture(this))
                 {
-                    capturedButton = button;
+                    capturedButton = actionState.CaptureButton;
                     ownsCapture = true;
                 }
             }
@@ -184,81 +208,16 @@ namespace Deucarian.ViewerNavigation
             return pointerCapture;
         }
 
-        private bool IsCurrentActionBlocked(Mouse mouse)
+        private bool HasAllowedNavigationAction(
+            DeucarianNavigationActionState actionState)
         {
-            Vector2 position = mouse != null ? mouse.position.ReadValue() : Vector2.zero;
-            return IsPointerInputBlocked(position) || IsKeyboardInputBlocked();
-        }
-
-        private bool TryGetCaptureButton(Mouse mouse, out DeucarianMouseButton button)
-        {
-            if (mouse != null)
-            {
-                if (!isTopDown && mode == ViewerNavigationMode.Orbit &&
-                    mouse.leftButton.wasPressedThisFrame)
-                {
-                    button = DeucarianMouseButton.Left;
-                    return true;
-                }
-
-                if (mouse.rightButton.wasPressedThisFrame)
-                {
-                    button = DeucarianMouseButton.Right;
-                    return true;
-                }
-            }
-
-            button = default;
-            return false;
-        }
-
-        private static bool HasNewNavigationAction(Mouse mouse, Keyboard keyboard)
-        {
-            return (mouse != null &&
-                    (mouse.leftButton.wasPressedThisFrame ||
-                     mouse.rightButton.wasPressedThisFrame ||
-                     mouse.middleButton.wasPressedThisFrame ||
-                     Mathf.Abs(mouse.scroll.ReadValue().y) > 0.0001f)) ||
-                   (keyboard != null && keyboard.anyKey.wasPressedThisFrame);
-        }
-
-        private static bool IsInputNeutral(Mouse mouse, Keyboard keyboard)
-        {
-            bool mouseNeutral = mouse == null ||
-                                (!mouse.leftButton.isPressed &&
-                                 !mouse.rightButton.isPressed &&
-                                 !mouse.middleButton.isPressed &&
-                                 !mouse.forwardButton.isPressed &&
-                                 !mouse.backButton.isPressed);
-            return mouseNeutral && (keyboard == null || !keyboard.anyKey.isPressed);
-        }
-
-        private static bool IsButtonPressed(Mouse mouse, DeucarianMouseButton button)
-        {
-            ButtonControl control = GetButton(mouse, button);
-            return control != null && control.isPressed;
-        }
-
-        private static ButtonControl GetButton(Mouse mouse, DeucarianMouseButton button)
-        {
-            if (mouse == null)
-            {
-                return null;
-            }
-
-            switch (button)
-            {
-                case DeucarianMouseButton.Right:
-                    return mouse.rightButton;
-                case DeucarianMouseButton.Middle:
-                    return mouse.middleButton;
-                case DeucarianMouseButton.Forward:
-                    return mouse.forwardButton;
-                case DeucarianMouseButton.Back:
-                    return mouse.backButton;
-                default:
-                    return mouse.leftButton;
-            }
+            bool pointerAllowed =
+                actionState.HasPointerAction &&
+                !IsPointerInputBlocked(actionState.PointerPosition);
+            bool keyboardAllowed =
+                actionState.HasKeyboardAction &&
+                !IsKeyboardInputBlocked();
+            return pointerAllowed || keyboardAllowed;
         }
 
         private void ReleaseCapture()

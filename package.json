@@ -22,7 +22,7 @@
   ],
   "dependencies": {
     "com.deucarian.camera-navigation": "0.2.10",
-    "com.deucarian.camera-navigation.input-system-integration": "0.1.5",
+    "com.deucarian.camera-navigation.input-system-integration": "0.1.6",
     "com.deucarian.common": "0.2.1",
     "com.deucarian.diagnostics": "0.1.4",
     "com.deucarian.editor": "1.0.5",
@@ -30,7 +30,6 @@
     "com.deucarian.pointer-capture": "0.1.2",
     "com.deucarian.theming": "1.0.3",
     "com.deucarian.ui": "0.2.1",
-    "com.unity.inputsystem": "1.17.0",
     "com.unity.ugui": "1.0.0",
     "com.unity.modules.uielements": "1.0.0"
   },

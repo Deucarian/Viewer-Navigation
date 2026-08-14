@@ -16,6 +16,9 @@ namespace Deucarian.ViewerNavigation.UI
             new Dictionary<ViewerViewFace, Button>();
         private readonly List<FaceDepth> depths = new List<FaceDepth>(6);
         private ViewerViewFace activeFace = ViewerViewFace.Front;
+        private Color surfaceColor = new Color(0.12f, 0.17f, 0.22f, 0.94f);
+        private Color textColor = new Color(0.82f, 0.88f, 0.92f, 1f);
+        private Color accentColor = new Color(0.10f, 0.72f, 0.74f, 0.98f);
 
         public event Action<ViewerViewFace> FaceSelected;
         public ViewerViewFace ActiveFace => activeFace;
@@ -91,11 +94,9 @@ namespace Deucarian.ViewerNavigation.UI
             {
                 bool selected = pair.Key == face;
                 pair.Value.style.backgroundColor = selected
-                    ? new Color(0.10f, 0.72f, 0.74f, 0.98f)
-                    : new Color(0.12f, 0.17f, 0.22f, 0.94f);
-                pair.Value.style.color = selected
-                    ? Color.white
-                    : new Color(0.82f, 0.88f, 0.92f, 1f);
+                    ? accentColor
+                    : surfaceColor;
+                pair.Value.style.color = textColor;
             }
         }
 
@@ -112,14 +113,11 @@ namespace Deucarian.ViewerNavigation.UI
 
         public void ApplyPalette(Color surface, Color text, Color accent)
         {
+            surfaceColor = new Color(surface.r, surface.g, surface.b, 0.96f);
+            textColor = text;
+            accentColor = accent;
             style.backgroundColor = new Color(surface.r, surface.g, surface.b, 0.86f);
-            foreach (KeyValuePair<ViewerViewFace, Button> pair in buttons)
-            {
-                pair.Value.style.color = text;
-                pair.Value.style.backgroundColor = pair.Key == activeFace
-                    ? accent
-                    : new Color(surface.r, surface.g, surface.b, 0.96f);
-            }
+            SetActiveFace(activeFace);
         }
 
         public Button GetFaceButton(ViewerViewFace face)

@@ -54,15 +54,20 @@ namespace Deucarian.ViewerNavigation.Tests
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
-            Vector3 origin = camera.transform.position;
+            Vector3 originPosition = camera.transform.position;
             Quaternion rotation = camera.transform.rotation;
             controller.CaptureOrigin();
+            Assert.That(
+                controller.TryGetOrigin(
+                    out Deucarian.CameraNavigation.DeucarianCameraPose originPose),
+                Is.True);
+            Assert.That(originPose.Position, Is.EqualTo(camera.transform.position));
             camera.orthographic = true;
             camera.transform.SetPositionAndRotation(Vector3.one * 100f, Quaternion.identity);
 
             Assert.That(controller.ReturnToOrigin(false), Is.True);
 
-            Assert.That(camera.transform.position, Is.EqualTo(origin));
+            Assert.That(camera.transform.position, Is.EqualTo(originPosition));
             Assert.That(camera.transform.rotation, Is.EqualTo(rotation));
             Assert.That(camera.orthographic, Is.False);
         }
@@ -79,6 +84,39 @@ namespace Deucarian.ViewerNavigation.Tests
             Assert.That(camera.orthographic, Is.True);
             Assert.That(controller.IsTopDown, Is.True);
             Assert.That(camera.transform.forward.y, Is.LessThan(-0.99f));
+        }
+
+        [Test]
+        public void CanonicalFacePreservesPivotReferenceBoundsAndOrigin()
+        {
+            Bounds bounds = new Bounds(
+                new Vector3(4f, 2f, 8f),
+                new Vector3(10f, 6f, 12f));
+            Vector3 pivot = new Vector3(1f, 3f, 6f);
+            Assert.That(controller.SetReferenceBounds(bounds, pivot), Is.True);
+            Assert.That(controller.CaptureOrigin(), Is.True);
+            Assert.That(
+                controller.TryGetOrigin(
+                    out Deucarian.CameraNavigation.DeucarianCameraPose beforeOrigin),
+                Is.True);
+
+            Assert.That(
+                controller.NavigateToFace(ViewerViewFace.Right, false),
+                Is.True);
+
+            Assert.That(controller.Pivot, Is.EqualTo(pivot));
+            Assert.That(controller.ReferenceBounds, Is.EqualTo(bounds));
+            Assert.That(
+                controller.TryGetOrigin(
+                    out Deucarian.CameraNavigation.DeucarianCameraPose afterOrigin),
+                Is.True);
+            Assert.That(afterOrigin.Position, Is.EqualTo(beforeOrigin.Position));
+            Assert.That(afterOrigin.Rotation, Is.EqualTo(beforeOrigin.Rotation));
+            Assert.That(afterOrigin.Orthographic, Is.EqualTo(beforeOrigin.Orthographic));
+            Assert.That(
+                afterOrigin.OrthographicSize,
+                Is.EqualTo(beforeOrigin.OrthographicSize));
+            Assert.That(afterOrigin.FieldOfView, Is.EqualTo(beforeOrigin.FieldOfView));
         }
 
         [Test]

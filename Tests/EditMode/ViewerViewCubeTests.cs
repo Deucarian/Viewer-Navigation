@@ -68,5 +68,25 @@ namespace Deucarian.ViewerNavigation.Tests
             cube.UpdateOrientation(Quaternion.Euler(0f, 180f, 0f));
             Assert.That(cube.ActiveFace, Is.EqualTo(ViewerViewFace.Back));
         }
+
+        [Test]
+        public void OrientationUpdatesPreserveAppliedThemePalette()
+        {
+            ViewerViewCubeElement cube = new ViewerViewCubeElement();
+            Color surface = new Color(0.21f, 0.31f, 0.41f, 1f);
+            Color text = new Color(0.91f, 0.81f, 0.71f, 1f);
+            Color accent = new Color(0.61f, 0.11f, 0.31f, 1f);
+            cube.ApplyPalette(surface, text, accent);
+
+            cube.UpdateOrientation(Quaternion.Euler(0f, 180f, 0f));
+
+            Button active = cube.GetFaceButton(ViewerViewFace.Back);
+            Button inactive = cube.GetFaceButton(ViewerViewFace.Front);
+            Assert.That(active.style.backgroundColor.value, Is.EqualTo(accent));
+            Assert.That(active.style.color.value, Is.EqualTo(text));
+            Assert.That(
+                inactive.style.backgroundColor.value,
+                Is.EqualTo(new Color(surface.r, surface.g, surface.b, 0.96f)));
+        }
     }
 }
