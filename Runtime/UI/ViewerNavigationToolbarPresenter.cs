@@ -143,6 +143,11 @@ namespace Deucarian.ViewerNavigation.UI
 
         private void BuildToolbar()
         {
+            float toolbarWidth =
+                DeucarianControlIslandStyle.CalculatePanelWidth(
+                    DeucarianControlIslandStyle.CompactPanel,
+                    DeucarianControlIslandStyle.RoundedSquareButton,
+                    4);
             toolbar = new VisualElement
             {
                 name = ToolbarName,
@@ -151,7 +156,8 @@ namespace Deucarian.ViewerNavigation.UI
             toolbar.style.position = Position.Absolute;
             toolbar.style.bottom = 56f;
             toolbar.style.left = Length.Percent(50f);
-            toolbar.style.marginLeft = -82f;
+            toolbar.style.width = toolbarWidth;
+            toolbar.style.marginLeft = -toolbarWidth * 0.5f;
             root.Add(toolbar);
 
             orbitButton = CreateToolbarButton("Orbit", "O", "Orbit navigation");

@@ -89,4 +89,32 @@ namespace Deucarian.ViewerNavigation.Tests
                 Is.EqualTo(new Color(surface.r, surface.g, surface.b, 0.96f)));
         }
     }
+
+    public sealed class ViewerNavigationToolbarPresenterTests
+    {
+        [Test]
+        public void ToolbarHasExplicitCenteredWidthForRuntimePanels()
+        {
+            var gameObject = new GameObject("Viewer Navigation Toolbar Test");
+            try
+            {
+                var presenter =
+                    gameObject.AddComponent<ViewerNavigationToolbarPresenter>();
+                presenter.Initialize(null);
+
+                VisualElement toolbar = presenter.Root.Q<VisualElement>(
+                    ViewerNavigationToolbarPresenter.ToolbarName);
+                Assert.That(toolbar, Is.Not.Null);
+                Assert.That(toolbar.style.width.value.value, Is.GreaterThan(0f));
+                Assert.That(
+                    toolbar.style.marginLeft.value.value,
+                    Is.EqualTo(-toolbar.style.width.value.value * 0.5f));
+                Assert.That(toolbar.Query<Button>().ToList(), Has.Count.EqualTo(4));
+            }
+            finally
+            {
+                Object.DestroyImmediate(gameObject);
+            }
+        }
+    }
 }
