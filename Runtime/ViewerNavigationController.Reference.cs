@@ -30,7 +30,8 @@ namespace Deucarian.ViewerNavigation
             bool frame = true,
             bool captureOrigin = true)
         {
-            if (!DeucarianCameraFraming.TryCalculateRendererBounds(
+            if (referenceBoundsStrategy == null ||
+                !referenceBoundsStrategy.TryGetBounds(
                     referenceRoot,
                     out Bounds bounds))
             {

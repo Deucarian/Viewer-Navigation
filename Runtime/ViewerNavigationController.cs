@@ -19,6 +19,8 @@ namespace Deucarian.ViewerNavigation
         private DeucarianCameraNavigationControls controls;
         private DeucarianInputSystemNavigationSettings inputSettings;
         private IDeucarianCameraFramingSettings framingSettings;
+        private IDeucarianFramingBoundsStrategy<GameObject>
+            referenceBoundsStrategy = DeucarianRendererBoundsStrategy.Instance;
         private IViewerNavigationMotionProfile motionProfile;
         private IViewerNavigationInputBlocker externalInputBlocker;
         private DiagnosticProviderRegistration diagnosticRegistration;
@@ -46,13 +48,17 @@ namespace Deucarian.ViewerNavigation
             : referenceBounds.center;
         public DeucarianCameraNavigationControls Controls => controls;
         public IDeucarianCameraFramingSettings FramingSettings => framingSettings;
+        public IDeucarianFramingBoundsStrategy<GameObject>
+            ReferenceBoundsStrategy => referenceBoundsStrategy;
         public IViewerNavigationMotionProfile MotionProfile => motionProfile;
         public ViewerNavigationInteractionGate InteractionGate => interactionGate;
 
         public void Initialize(
             Camera camera,
             ViewerNavigationSettings configuration,
-            IViewerNavigationInputBlocker inputBlocker = null)
+            IViewerNavigationInputBlocker inputBlocker = null,
+            IDeucarianFramingBoundsStrategy<GameObject>
+                navigationReferenceBoundsStrategy = null)
         {
             settings = configuration;
             Initialize(
@@ -61,7 +67,8 @@ namespace Deucarian.ViewerNavigation
                 configuration != null ? configuration.InputSettings : null,
                 configuration,
                 configuration != null ? configuration.FramingSettings : null,
-                inputBlocker);
+                inputBlocker,
+                navigationReferenceBoundsStrategy);
         }
 
         public void Initialize(
@@ -70,7 +77,9 @@ namespace Deucarian.ViewerNavigation
             DeucarianInputSystemNavigationSettings navigationInputSettings = null,
             IViewerNavigationMotionProfile navigationMotionProfile = null,
             IDeucarianCameraFramingSettings navigationFramingSettings = null,
-            IViewerNavigationInputBlocker inputBlocker = null)
+            IViewerNavigationInputBlocker inputBlocker = null,
+            IDeucarianFramingBoundsStrategy<GameObject>
+                navigationReferenceBoundsStrategy = null)
         {
             CancelTransition();
             UnsubscribeGate();
@@ -81,6 +90,8 @@ namespace Deucarian.ViewerNavigation
             motionProfile = navigationMotionProfile ??
                             new DefaultViewerNavigationMotionProfile();
             framingSettings = navigationFramingSettings;
+            referenceBoundsStrategy = navigationReferenceBoundsStrategy ??
+                                      DeucarianRendererBoundsStrategy.Instance;
             externalInputBlocker = inputBlocker;
 
             EnsureStateSubscription();

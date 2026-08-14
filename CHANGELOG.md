@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 - 2026-08-14
+
+- Coordinated configured drag actions with the Pointer Capture Requested, Active,
+  Rejected, and Lost lifecycle; navigation now remains blocked until capture is active
+  and a lost or rejected held gesture cannot resume without release and rearming.
+- Added an injectable renderer-bounds strategy so consumers can preserve their proven
+  model framing policy without retaining a second navigation engine.
+
 ## 0.1.0 - 2026-08-13
 
 - Added the viewer navigation composition root and authoritative state owner.

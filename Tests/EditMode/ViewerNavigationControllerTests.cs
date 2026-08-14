@@ -1,3 +1,4 @@
+using Deucarian.CameraNavigation;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -160,6 +161,57 @@ namespace Deucarian.ViewerNavigation.Tests
             Assert.That(applied, Is.False);
             Assert.That(controller.HasReferenceBounds, Is.True);
             Assert.That(controller.ReferenceBounds, Is.EqualTo(valid));
+        }
+
+        [Test]
+        public void InjectedReferenceBoundsStrategyControlsRegistration()
+        {
+            Bounds expected = new Bounds(
+                new Vector3(8f, 3f, -2f),
+                new Vector3(4f, 6f, 10f));
+            var strategy = new TestReferenceBoundsStrategy(expected);
+            GameObject reference = new GameObject("Renderer-Free Reference");
+            try
+            {
+                controller.Initialize(
+                    camera,
+                    navigationReferenceBoundsStrategy: strategy);
+
+                bool registered = controller.RegisterReference(
+                    reference,
+                    frame: false,
+                    captureOrigin: false);
+
+                Assert.That(registered, Is.True);
+                Assert.That(strategy.CallCount, Is.EqualTo(1));
+                Assert.That(controller.ReferenceBounds, Is.EqualTo(expected));
+                Assert.That(controller.Pivot, Is.EqualTo(expected.center));
+                Assert.That(controller.ReferenceBoundsStrategy, Is.SameAs(strategy));
+            }
+            finally
+            {
+                Object.DestroyImmediate(reference);
+            }
+        }
+
+        private sealed class TestReferenceBoundsStrategy :
+            IDeucarianFramingBoundsStrategy<GameObject>
+        {
+            private readonly Bounds bounds;
+
+            internal TestReferenceBoundsStrategy(Bounds bounds)
+            {
+                this.bounds = bounds;
+            }
+
+            internal int CallCount { get; private set; }
+
+            public bool TryGetBounds(GameObject source, out Bounds result)
+            {
+                CallCount++;
+                result = bounds;
+                return source != null;
+            }
         }
     }
 }

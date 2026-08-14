@@ -4,7 +4,7 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.0`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.1`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -24,7 +24,9 @@ ViewerNavigationInstaller navigation = ViewerNavigationInstaller.Create(
     navigationControls,
     inputSettings,
     motionProfile,
-    framingSettings);
+    framingSettings,
+    inputBlocker,
+    referenceBoundsStrategy);
 navigation.BeginReferenceLoad();
 navigation.RegisterReference(loadedModelRoot, frame: true, captureOrigin: true);
 ```
@@ -44,6 +46,8 @@ transitions before applying the replacement dependencies.
 - `IViewerNavigationMotionProfile` supplies application-specific timing and easing.
 - `IViewerNavigationInputBlocker` lets a host block input without coupling this package
   to application UI.
+- `IDeucarianFramingBoundsStrategy<GameObject>` lets a host preserve its proven
+  model-bounds policy while the shared controller remains the only navigation owner.
 - `ViewerViewFacePolicy` maps six canonical cube faces to model-relative directions.
 
 `SetNavigationMode`, `SetTopDown`, `NavigateToFace`, `FrameReference`, and
@@ -101,8 +105,8 @@ requests and pushes to `develop` and `main`.
   whether the host input blocker or a focused UI control is intentionally blocking it.
 - Home does nothing: capture the origin after model placement with
   `RegisterReference(..., captureOrigin: true)` or call `CaptureOrigin` explicitly.
-- No reference framing: the registered root must contain at least one renderer, or the
-  host must call `SetReferenceBounds` with finite, non-zero bounds.
+- No reference framing: the registered root must satisfy the configured bounds strategy,
+  or the host must call `SetReferenceBounds` with finite, non-zero bounds.
 - Toolbar or cube missing: enable the corresponding presentation options on
   `ViewerNavigationSettings`; the dependency-explicit overload uses both by default.
 

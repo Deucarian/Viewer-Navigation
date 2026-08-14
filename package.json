@@ -1,6 +1,6 @@
 {
   "name": "com.deucarian.viewer-navigation",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Deucarian Viewer Navigation",
   "description": "Reusable viewer navigation experience composing camera navigation, Input System controls, pointer capture, UI, theming, logging, and diagnostics.",
   "unity": "2022.3",
@@ -22,7 +22,7 @@
   ],
   "dependencies": {
     "com.deucarian.camera-navigation": "0.2.10",
-    "com.deucarian.camera-navigation.input-system-integration": "0.1.6",
+    "com.deucarian.camera-navigation.input-system-integration": "0.1.7",
     "com.deucarian.common": "0.2.1",
     "com.deucarian.diagnostics": "0.1.4",
     "com.deucarian.editor": "1.0.5",

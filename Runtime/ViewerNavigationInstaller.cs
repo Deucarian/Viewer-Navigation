@@ -20,7 +20,9 @@ namespace Deucarian.ViewerNavigation
             Transform parent,
             Camera camera,
             ViewerNavigationSettings configuration = null,
-            IViewerNavigationInputBlocker inputBlocker = null)
+            IViewerNavigationInputBlocker inputBlocker = null,
+            IDeucarianFramingBoundsStrategy<GameObject>
+                referenceBoundsStrategy = null)
         {
             ViewerNavigationInstaller installer = FindUnder(parent);
             if (installer == null)
@@ -34,7 +36,11 @@ namespace Deucarian.ViewerNavigation
                 installer = gameObject.AddComponent<ViewerNavigationInstaller>();
             }
 
-            installer.Initialize(camera, configuration, inputBlocker);
+            installer.Initialize(
+                camera,
+                configuration,
+                inputBlocker,
+                referenceBoundsStrategy);
             return installer;
         }
 
@@ -45,7 +51,9 @@ namespace Deucarian.ViewerNavigation
             DeucarianInputSystemNavigationSettings inputSettings,
             IViewerNavigationMotionProfile motionProfile,
             IDeucarianCameraFramingSettings framingSettings = null,
-            IViewerNavigationInputBlocker inputBlocker = null)
+            IViewerNavigationInputBlocker inputBlocker = null,
+            IDeucarianFramingBoundsStrategy<GameObject>
+                referenceBoundsStrategy = null)
         {
             ViewerNavigationInstaller installer = FindUnder(parent);
             if (installer == null)
@@ -65,14 +73,17 @@ namespace Deucarian.ViewerNavigation
                 inputSettings,
                 motionProfile,
                 framingSettings,
-                inputBlocker);
+                inputBlocker,
+                referenceBoundsStrategy);
             return installer;
         }
 
         public void Initialize(
             Camera camera,
             ViewerNavigationSettings configuration,
-            IViewerNavigationInputBlocker inputBlocker = null)
+            IViewerNavigationInputBlocker inputBlocker = null,
+            IDeucarianFramingBoundsStrategy<GameObject>
+                referenceBoundsStrategy = null)
         {
             settings = configuration;
             navigationCamera = camera;
@@ -84,7 +95,8 @@ namespace Deucarian.ViewerNavigation
                 configuration,
                 ResolveFramingSettings(
                     configuration != null ? configuration.FramingSettings : null),
-                inputBlocker);
+                inputBlocker,
+                referenceBoundsStrategy);
             Toolbar.Initialize(Controller, configuration);
         }
 
@@ -94,7 +106,9 @@ namespace Deucarian.ViewerNavigation
             DeucarianInputSystemNavigationSettings inputSettings,
             IViewerNavigationMotionProfile motionProfile,
             IDeucarianCameraFramingSettings framingSettings = null,
-            IViewerNavigationInputBlocker inputBlocker = null)
+            IViewerNavigationInputBlocker inputBlocker = null,
+            IDeucarianFramingBoundsStrategy<GameObject>
+                referenceBoundsStrategy = null)
         {
             settings = null;
             navigationCamera = camera;
@@ -105,7 +119,8 @@ namespace Deucarian.ViewerNavigation
                 inputSettings,
                 motionProfile,
                 ResolveFramingSettings(framingSettings),
-                inputBlocker);
+                inputBlocker,
+                referenceBoundsStrategy);
             Toolbar.Initialize(Controller, settings);
         }
 

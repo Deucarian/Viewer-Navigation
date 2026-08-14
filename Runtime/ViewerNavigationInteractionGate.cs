@@ -17,12 +17,16 @@ namespace Deucarian.ViewerNavigation
     {
         private readonly List<VisualElement> uiRoots = new List<VisualElement>();
         private DeucarianPointerCaptureController pointerCapture;
+        private IViewerPointerCaptureSession pointerCaptureSession;
         private IViewerNavigationInputBlocker externalBlocker;
         private IDeucarianNavigationActionStateSource actionStateSource;
         private ViewerNavigationMode mode;
         private bool isTopDown;
         private DeucarianMouseButton capturedButton;
+        private DeucarianMouseButton deniedCaptureButton;
         private bool ownsCapture;
+        private bool captureDeniedUntilRelease;
+        private bool captureSessionSubscribed;
 
         public event Action NavigationInputStarted;
 
@@ -65,14 +69,30 @@ namespace Deucarian.ViewerNavigation
 
         public bool IsPointerInputBlocked(Vector2 screenPosition)
         {
-            if (externalBlocker != null &&
-                externalBlocker.IsPointerInputBlocked(screenPosition))
+            if (IsTopDownRotationBlocked())
             {
                 return true;
             }
 
-            if (isTopDown && actionStateSource != null &&
-                actionStateSource.IsOrbitRotatePressed())
+            if (HasAcceptedCapture())
+            {
+                return false;
+            }
+
+            if (captureDeniedUntilRelease ||
+                IsCaptureRequiredPointerActionPressed())
+            {
+                return true;
+            }
+
+            return IsPointerBlockedByApplication(screenPosition);
+        }
+
+        private bool IsPointerBlockedByApplication(Vector2 screenPosition)
+        {
+            if (IsTopDownRotationBlocked() ||
+                (externalBlocker != null &&
+                 externalBlocker.IsPointerInputBlocked(screenPosition)))
             {
                 return true;
             }
@@ -136,6 +156,12 @@ namespace Deucarian.ViewerNavigation
             ResolvePointerCapture();
         }
 
+        private void OnEnable()
+        {
+            ResolvePointerCapture();
+            SubscribeCaptureSession();
+        }
+
         private void Update()
         {
             ProcessInputState();
@@ -143,10 +169,11 @@ namespace Deucarian.ViewerNavigation
 
         public void ProcessInputState()
         {
-            DeucarianPointerCaptureController capture = ResolvePointerCapture();
+            ResolvePointerCapture();
             if (actionStateSource == null)
             {
-                capture.UpdateInputRearming(true, false);
+                pointerCaptureSession.UpdateInputRearming(true, false);
+                ReleaseCapture();
                 return;
             }
 
@@ -156,20 +183,16 @@ namespace Deucarian.ViewerNavigation
                         ? DeucarianInputSystemNavigationMode.Orbit
                         : DeucarianInputSystemNavigationMode.Fly,
                     isTopDown);
-            capture.UpdateInputRearming(
+            pointerCaptureSession.UpdateInputRearming(
                 actionState.IsNeutral,
-                actionState.HasNewNavigationAction);
+                actionState.CaptureRequested);
+            ClearCaptureDenialAfterRelease();
 
             if (actionState.EscapePressed)
             {
-                capture.NotifyEscapePressed();
+                pointerCaptureSession.NotifyEscapePressed();
                 ResetCapture();
                 return;
-            }
-
-            if (HasAllowedNavigationAction(actionState))
-            {
-                NavigationInputStarted?.Invoke();
             }
 
             if (ownsCapture &&
@@ -180,18 +203,36 @@ namespace Deucarian.ViewerNavigation
 
             if (!ownsCapture && actionState.CaptureRequested)
             {
-                if (!IsPointerInputBlocked(actionState.PointerPosition) &&
-                    capture.RequestCapture(this))
+                if (!IsPointerBlockedByApplication(actionState.PointerPosition) &&
+                    pointerCaptureSession.RequestCapture(this) &&
+                    IsOwnedCaptureState(pointerCaptureSession.State))
                 {
                     capturedButton = actionState.CaptureButton;
                     ownsCapture = true;
+                    captureDeniedUntilRelease = false;
+                    deniedCaptureButton = default;
                 }
+                else
+                {
+                    DenyCaptureUntilRelease(actionState.CaptureButton);
+                }
+            }
+
+            if (HasAllowedNavigationAction(actionState))
+            {
+                NavigationInputStarted?.Invoke();
             }
         }
 
         private void OnDisable()
         {
             ReleaseCapture();
+            UnsubscribeCaptureSession();
+        }
+
+        private void OnDestroy()
+        {
+            UnsubscribeCaptureSession();
         }
 
         private DeucarianPointerCaptureController ResolvePointerCapture()
@@ -205,6 +246,13 @@ namespace Deucarian.ViewerNavigation
                 }
             }
 
+            if (pointerCaptureSession == null)
+            {
+                pointerCaptureSession =
+                    new ViewerPointerCaptureSession(pointerCapture);
+                SubscribeCaptureSession();
+            }
+
             return pointerCapture;
         }
 
@@ -213,7 +261,9 @@ namespace Deucarian.ViewerNavigation
         {
             bool pointerAllowed =
                 actionState.HasPointerAction &&
-                !IsPointerInputBlocked(actionState.PointerPosition);
+                (actionState.CaptureRequested
+                    ? HasAcceptedCapture()
+                    : !IsPointerInputBlocked(actionState.PointerPosition));
             bool keyboardAllowed =
                 actionState.HasKeyboardAction &&
                 !IsKeyboardInputBlocked();
@@ -222,9 +272,9 @@ namespace Deucarian.ViewerNavigation
 
         private void ReleaseCapture()
         {
-            if (pointerCapture != null && ownsCapture)
+            if (pointerCaptureSession != null && ownsCapture)
             {
-                pointerCapture.ReleaseCapture(this);
+                pointerCaptureSession.ReleaseCapture(this);
             }
 
             ResetCapture();
@@ -234,6 +284,135 @@ namespace Deucarian.ViewerNavigation
         {
             ownsCapture = false;
             capturedButton = default;
+        }
+
+        internal void SetPointerCaptureSessionForTesting(
+            IViewerPointerCaptureSession session)
+        {
+            if (session == null)
+            {
+                throw new ArgumentNullException(nameof(session));
+            }
+
+            ReleaseCapture();
+            UnsubscribeCaptureSession();
+            pointerCaptureSession = session;
+            captureDeniedUntilRelease = false;
+            deniedCaptureButton = default;
+            SubscribeCaptureSession();
+        }
+
+        private bool HasAcceptedCapture()
+        {
+            return ownsCapture &&
+                   pointerCaptureSession != null &&
+                   pointerCaptureSession.State ==
+                       DeucarianPointerCaptureState.Active;
+        }
+
+        private bool IsCaptureRequiredPointerActionPressed()
+        {
+            return actionStateSource is
+                       IDeucarianCaptureRequiredActionStateSource captureSource &&
+                   captureSource.IsCaptureRequiredPointerActionPressed(
+                       isTopDown || mode == ViewerNavigationMode.Orbit
+                           ? DeucarianInputSystemNavigationMode.Orbit
+                           : DeucarianInputSystemNavigationMode.Fly,
+                       isTopDown);
+        }
+
+        private bool IsTopDownRotationBlocked()
+        {
+            return isTopDown &&
+                   actionStateSource != null &&
+                   actionStateSource.IsOrbitRotatePressed();
+        }
+
+        private void DenyCaptureUntilRelease(DeucarianMouseButton button)
+        {
+            deniedCaptureButton = button;
+            captureDeniedUntilRelease = true;
+            ResetCapture();
+        }
+
+        private void ClearCaptureDenialAfterRelease()
+        {
+            if (!captureDeniedUntilRelease ||
+                actionStateSource.IsButtonPressed(deniedCaptureButton))
+            {
+                return;
+            }
+
+            captureDeniedUntilRelease = false;
+            deniedCaptureButton = default;
+        }
+
+        private void SubscribeCaptureSession()
+        {
+            if (captureSessionSubscribed ||
+                pointerCaptureSession == null ||
+                !isActiveAndEnabled)
+            {
+                return;
+            }
+
+            pointerCaptureSession.StateChanged += OnPointerCaptureStateChanged;
+            captureSessionSubscribed = true;
+        }
+
+        private void UnsubscribeCaptureSession()
+        {
+            if (!captureSessionSubscribed || pointerCaptureSession == null)
+            {
+                return;
+            }
+
+            pointerCaptureSession.StateChanged -= OnPointerCaptureStateChanged;
+            captureSessionSubscribed = false;
+        }
+
+        private void OnPointerCaptureStateChanged(
+            object sender,
+            DeucarianPointerCaptureStateChangedEventArgs eventArgs)
+        {
+            if (eventArgs == null)
+            {
+                return;
+            }
+
+            if (eventArgs.CurrentState ==
+                DeucarianPointerCaptureState.Requested)
+            {
+                return;
+            }
+
+            if (eventArgs.CurrentState ==
+                DeucarianPointerCaptureState.Active)
+            {
+                if (ownsCapture)
+                {
+                    NavigationInputStarted?.Invoke();
+                }
+
+                return;
+            }
+
+            if (ownsCapture &&
+                actionStateSource != null &&
+                actionStateSource.IsButtonPressed(capturedButton))
+            {
+                deniedCaptureButton = capturedButton;
+                captureDeniedUntilRelease = true;
+            }
+
+            ResetCapture();
+        }
+
+        private static bool IsOwnedCaptureState(
+            DeucarianPointerCaptureState state)
+        {
+            return state == DeucarianPointerCaptureState.Requested ||
+                   state == DeucarianPointerCaptureState.Active;
         }
 
         private void UnregisterUiRoot(VisualElement root)
