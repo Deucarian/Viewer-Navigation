@@ -81,5 +81,61 @@ namespace Deucarian.ViewerNavigation.Tests
                 Object.DestroyImmediate(cameraObject);
             }
         }
+
+        [Test]
+        public void AnimationPolicyGatesPresetWithoutForkingItsTuning()
+        {
+            GameObject root = new GameObject("Animation Policy Test");
+            GameObject cameraObject = new GameObject("Camera");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            var policy = new TestAnimationPolicy { ShouldAnimate = false };
+            try
+            {
+                ViewerNavigationSettings preset =
+                    ViewerNavigationSettings.LoadReferencePreset();
+                ViewerNavigationInstaller installer =
+                    ViewerNavigationInstaller.Create(
+                        root.transform,
+                        camera,
+                        preset,
+                        animationPolicy: policy);
+
+                Assert.That(
+                    installer.Controller.MotionProfile.AnimateTransitions,
+                    Is.False);
+                Assert.That(
+                    installer.Controller.MotionProfile
+                        .CalculateTransitionDuration(10f),
+                    Is.Zero);
+                Assert.That(
+                    installer.Controller.MotionProfile
+                        .TransitionMatchFieldOfView,
+                    Is.EqualTo(preset.TransitionMatchFieldOfView));
+                Assert.That(
+                    installer.Controller.MotionProfile.EvaluateMovement(0.4f),
+                    Is.EqualTo(preset.EvaluateMovement(0.4f)));
+
+                policy.ShouldAnimate = true;
+
+                Assert.That(
+                    installer.Controller.MotionProfile.AnimateTransitions,
+                    Is.True);
+                Assert.That(
+                    installer.Controller.MotionProfile
+                        .CalculateTransitionDuration(10f),
+                    Is.EqualTo(preset.CalculateTransitionDuration(10f)));
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+                Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        private sealed class TestAnimationPolicy :
+            IViewerNavigationAnimationPolicy
+        {
+            public bool ShouldAnimate { get; set; }
+        }
     }
 }
