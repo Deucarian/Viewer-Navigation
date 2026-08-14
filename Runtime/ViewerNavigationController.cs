@@ -112,6 +112,7 @@ namespace Deucarian.ViewerNavigation
             CancelTransition();
             UnsubscribeGate();
 
+            settings = null;
             navigationCamera = camera;
             controls = navigationControls;
             inputSettings = navigationInputSettings;
