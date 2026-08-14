@@ -3,6 +3,7 @@ using Deucarian.CameraNavigation.InputSystemIntegration;
 using Deucarian.PointerCapture;
 using NUnit.Framework;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Deucarian.ViewerNavigation.Tests
 {
