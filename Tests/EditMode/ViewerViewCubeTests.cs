@@ -116,5 +116,132 @@ namespace Deucarian.ViewerNavigation.Tests
                 Object.DestroyImmediate(gameObject);
             }
         }
+
+        [Test]
+        public void ToolbarUsesReportProvenIconsAndTooltipsInsteadOfLetters()
+        {
+            var gameObject = new GameObject("Viewer Navigation Toolbar Test");
+            try
+            {
+                var presenter =
+                    gameObject.AddComponent<ViewerNavigationToolbarPresenter>();
+                presenter.Initialize(null);
+
+                AssertIconButton(
+                    presenter.Root,
+                    ViewerNavigationToolbarPresenter.OrbitButtonName,
+                    ViewerNavigationToolbarPresenter.OrbitIconName,
+                    ViewerNavigationToolbarPresenter.OrbitTooltip);
+                AssertIconButton(
+                    presenter.Root,
+                    ViewerNavigationToolbarPresenter.FlyButtonName,
+                    ViewerNavigationToolbarPresenter.FlyIconName,
+                    ViewerNavigationToolbarPresenter.FlyTooltip);
+                AssertIconButton(
+                    presenter.Root,
+                    ViewerNavigationToolbarPresenter.HomeButtonName,
+                    ViewerNavigationToolbarPresenter.HomeIconName,
+                    ViewerNavigationToolbarPresenter.HomeTooltip);
+                AssertIconButton(
+                    presenter.Root,
+                    ViewerNavigationToolbarPresenter.TopDownButtonName,
+                    ViewerNavigationToolbarPresenter.PerspectiveIconName,
+                    ViewerNavigationToolbarPresenter.TopDownTooltip);
+
+                Assert.That(
+                    presenter.Root.Q<VisualElement>(
+                        ViewerNavigationRuntimeTooltipPresenter.BubbleName),
+                    Is.Not.Null);
+                Assert.That(presenter.ViewCube, Is.Null);
+            }
+            finally
+            {
+                Object.DestroyImmediate(gameObject);
+            }
+        }
+
+        [Test]
+        public void TopDownStateSwapsOrthographicAndPerspectiveIcons()
+        {
+            var gameObject = new GameObject("Viewer Navigation Visual State Test");
+            var state = new ViewerNavigationToolbarVisualState();
+            try
+            {
+                var orbit = new Button();
+                var fly = new Button();
+                var home = new Button();
+                var top = new Button();
+                var orbitIcon = new VisualElement();
+                var flyIcon = new VisualElement();
+                var homeIcon = new VisualElement();
+                var orthographicIcon = new VisualElement();
+                var perspectiveIcon = new VisualElement();
+                state.Initialize(
+                    gameObject.AddComponent<ViewerNavigationToolbarPresenter>(),
+                    orbit,
+                    fly,
+                    home,
+                    top,
+                    orbitIcon,
+                    flyIcon,
+                    homeIcon,
+                    orthographicIcon,
+                    perspectiveIcon);
+
+                state.Apply(CreateSnapshot(false));
+                Assert.That(
+                    orthographicIcon.style.display.value,
+                    Is.EqualTo(DisplayStyle.None));
+                Assert.That(
+                    perspectiveIcon.style.display.value,
+                    Is.EqualTo(DisplayStyle.Flex));
+
+                state.Apply(CreateSnapshot(true));
+                Assert.That(
+                    orthographicIcon.style.display.value,
+                    Is.EqualTo(DisplayStyle.Flex));
+                Assert.That(
+                    perspectiveIcon.style.display.value,
+                    Is.EqualTo(DisplayStyle.None));
+            }
+            finally
+            {
+                state.Dispose();
+                Object.DestroyImmediate(gameObject);
+            }
+        }
+
+        private static ViewerNavigationSnapshot CreateSnapshot(bool isTopDown) =>
+            new ViewerNavigationSnapshot(
+                ViewerNavigationMode.Orbit,
+                isTopDown,
+                false,
+                false,
+                false,
+                ViewerNavigationTransitionKind.None,
+                1);
+
+        private static void AssertIconButton(
+            VisualElement root,
+            string buttonName,
+            string visibleIconName,
+            string tooltip)
+        {
+            Button button = root.Q<Button>(buttonName);
+            Assert.That(button, Is.Not.Null, buttonName);
+            Assert.That(button.text, Is.Empty, buttonName);
+            Assert.That(button.tooltip, Is.EqualTo(tooltip), buttonName);
+            VisualElement icon = button.Q<VisualElement>(visibleIconName);
+            Assert.That(icon, Is.Not.Null, visibleIconName);
+            Assert.That(
+                icon.style.backgroundImage.value.texture,
+                Is.Not.Null,
+                visibleIconName);
+            Assert.That(
+                icon.style.display.value,
+                Is.EqualTo(DisplayStyle.Flex),
+                visibleIconName);
+        }
+
     }
 }

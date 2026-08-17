@@ -1,6 +1,6 @@
 {
   "name": "com.deucarian.viewer-navigation",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "displayName": "Deucarian Viewer Navigation",
   "description": "Reusable viewer navigation experience composing camera navigation, Input System controls, pointer capture, UI, theming, logging, and diagnostics.",
   "unity": "2022.3",
@@ -36,7 +36,7 @@
   "samples": [
     {
       "displayName": "Viewer Navigation Bootstrap",
-      "description": "Explicit composition-root example with a reference model and toolbar; the optional six-face view cube is disabled by default.",
+      "description": "Explicit composition-root example with a reference model and the Report Viewer-proven icon toolbar; the optional six-face view cube is disabled by default.",
       "path": "Samples~/Viewer Navigation Bootstrap"
     }
   ]

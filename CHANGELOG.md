@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.4 - 2026-08-17
+
+- Restored the polished Report Viewer navigation toolbar as shared package behavior:
+  Orbit, Fly, Recenter, and Top-view icons replace the temporary letter buttons.
+- Restored theme-driven selected, hover, pressed, focus, and disabled presentation,
+  orthographic/perspective icon swapping, and runtime/keyboard tooltips.
+- Added package regressions that require the real icon resources and continue to keep
+  the optional view cube disabled by default.
+
 ## 0.1.3 - 2026-08-17
 
 - Made the optional view cube opt-in. New settings, the packaged reference preset,
