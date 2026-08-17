@@ -113,6 +113,17 @@ namespace Deucarian.ViewerNavigation.UI
         private void BuildUi()
         {
             VisualElement documentRoot = document.rootVisualElement;
+            if (viewCube != null)
+            {
+                viewCube.FaceSelected -= OnFaceSelected;
+            }
+
+            toolbar = null;
+            orbitButton = null;
+            flyButton = null;
+            homeButton = null;
+            topButton = null;
+            viewCube = null;
             documentRoot.Clear();
             documentRoot.pickingMode = PickingMode.Ignore;
 
@@ -129,7 +140,7 @@ namespace Deucarian.ViewerNavigation.UI
                 BuildToolbar();
             }
 
-            if (settings == null || settings.ShowViewCube)
+            if (settings != null && settings.ShowViewCube)
             {
                 viewCube = new ViewerViewCubeElement();
                 viewCube.style.right = 20f;

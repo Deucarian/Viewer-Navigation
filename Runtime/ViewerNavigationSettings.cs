@@ -45,7 +45,8 @@ namespace Deucarian.ViewerNavigation
 
         [Header("Presentation")]
         [SerializeField] private bool showToolbar = true;
-        [SerializeField] private bool showViewCube = true;
+        [SerializeField, Tooltip("Show the optional six-face view cube. Disabled by default.")]
+        private bool showViewCube;
 
         public DeucarianCameraNavigationControls Controls => controls;
         public DeucarianInputSystemNavigationSettings InputSettings => inputSettings;

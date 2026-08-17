@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3 - 2026-08-17
+
+- Made the optional view cube opt-in. New settings, the packaged reference preset,
+  and presenter initialization without settings now keep it hidden by default.
+- Kept the existing package-level presentation toggle so individual viewers can
+  explicitly enable the six-face cube when their product calls for it.
+- Recomposition now clears an existing cube when the setting is switched off.
+
 ## 0.1.2 - 2026-08-14
 
 - Added the canonical reference-viewer navigation preset using the tuning proven by
