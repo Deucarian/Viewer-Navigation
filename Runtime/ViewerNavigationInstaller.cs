@@ -1,5 +1,6 @@
 using Deucarian.CameraNavigation;
 using Deucarian.CameraNavigation.InputSystemIntegration;
+using Deucarian.Theming;
 using Deucarian.ViewerNavigation.UI;
 using UnityEngine;
 
@@ -15,6 +16,7 @@ namespace Deucarian.ViewerNavigation
 
         public ViewerNavigationController Controller { get; private set; }
         public ViewerNavigationToolbarPresenter Toolbar { get; private set; }
+        public DeucarianThemeProvider ThemeProvider { get; private set; }
 
         public static ViewerNavigationInstaller Create(
             Transform parent,
@@ -25,17 +27,7 @@ namespace Deucarian.ViewerNavigation
                 referenceBoundsStrategy = null,
             IViewerNavigationAnimationPolicy animationPolicy = null)
         {
-            ViewerNavigationInstaller installer = FindUnder(parent);
-            if (installer == null)
-            {
-                GameObject gameObject = new GameObject(GameObjectName);
-                if (parent != null)
-                {
-                    gameObject.transform.SetParent(parent, false);
-                }
-
-                installer = gameObject.AddComponent<ViewerNavigationInstaller>();
-            }
+            ViewerNavigationInstaller installer = FindOrCreate(parent);
 
             installer.Initialize(
                 camera,
@@ -53,13 +45,17 @@ namespace Deucarian.ViewerNavigation
         {
             ViewerNavigationReferenceCompositionProfile referencePreset =
                 ViewerNavigationReferenceComposition.Resolve(animationPolicy);
-            return Create(
-                parent,
-                camera,
-                referencePreset.Preset,
-                referencePreset.InputBlocker,
-                referencePreset.BoundsStrategy,
-                referencePreset.AnimationPolicy);
+            return referencePreset.Compose(parent, camera);
+        }
+
+        internal static ViewerNavigationInstaller CreateWithReferenceComposition(
+            Transform parent,
+            Camera camera,
+            ViewerNavigationReferenceCompositionProfile composition)
+        {
+            ViewerNavigationInstaller installer = FindOrCreate(parent);
+            installer.InitializeReference(camera, composition);
+            return installer;
         }
 
         public static ViewerNavigationInstaller Create(
@@ -73,17 +69,7 @@ namespace Deucarian.ViewerNavigation
             IDeucarianFramingBoundsStrategy<GameObject>
                 referenceBoundsStrategy = null)
         {
-            ViewerNavigationInstaller installer = FindUnder(parent);
-            if (installer == null)
-            {
-                GameObject gameObject = new GameObject(GameObjectName);
-                if (parent != null)
-                {
-                    gameObject.transform.SetParent(parent, false);
-                }
-
-                installer = gameObject.AddComponent<ViewerNavigationInstaller>();
-            }
+            ViewerNavigationInstaller installer = FindOrCreate(parent);
 
             installer.Initialize(
                 camera,
@@ -94,6 +80,25 @@ namespace Deucarian.ViewerNavigation
                 inputBlocker,
                 referenceBoundsStrategy);
             return installer;
+        }
+
+        private void InitializeReference(
+            Camera camera,
+            ViewerNavigationReferenceCompositionProfile composition)
+        {
+            settings = composition.Preset;
+            navigationCamera = camera;
+            EnsureReferenceThemeProvider(
+                composition.ThemeProfile,
+                composition.ThemeMode);
+            EnsureComponents();
+            Controller.Initialize(
+                camera,
+                settings,
+                composition.InputBlocker,
+                composition.BoundsStrategy,
+                composition.AnimationPolicy);
+            Toolbar.Initialize(Controller, settings);
         }
 
         public void Initialize(
@@ -169,6 +174,38 @@ namespace Deucarian.ViewerNavigation
             {
                 Toolbar = gameObject.AddComponent<ViewerNavigationToolbarPresenter>();
             }
+        }
+
+        private void EnsureReferenceThemeProvider(
+            DeucarianViewerReferenceThemeProfile themeProfile,
+            DeucarianThemeMode themeMode)
+        {
+            ThemeProvider = GetComponent<DeucarianThemeProvider>();
+            if (ThemeProvider == null)
+            {
+                ThemeProvider = gameObject.AddComponent<DeucarianThemeProvider>();
+            }
+
+            ThemeProvider.SetThemeFamily(
+                themeProfile.ThemeFamily,
+                themeMode);
+        }
+
+        private static ViewerNavigationInstaller FindOrCreate(Transform parent)
+        {
+            ViewerNavigationInstaller installer = FindUnder(parent);
+            if (installer != null)
+            {
+                return installer;
+            }
+
+            GameObject gameObject = new GameObject(GameObjectName);
+            if (parent != null)
+            {
+                gameObject.transform.SetParent(parent, false);
+            }
+
+            return gameObject.AddComponent<ViewerNavigationInstaller>();
         }
 
         private static ViewerNavigationInstaller FindUnder(Transform parent)

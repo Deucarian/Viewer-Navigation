@@ -6,6 +6,7 @@
     "Deucarian.CameraNavigation.InputSystemIntegration",
     "Deucarian.Diagnostics",
     "Deucarian.PointerCapture",
+    "Deucarian.Theming",
     "Deucarian.ViewerNavigation",
     "UnityEngine.UIElementsModule"
   ],

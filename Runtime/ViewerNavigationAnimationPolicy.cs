@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Deucarian.ViewerNavigation
 {
@@ -11,9 +12,9 @@ namespace Deucarian.ViewerNavigation
 
         public ViewerNavigationAnimationPolicy(Func<bool> shouldAnimate = null)
         {
-            this.shouldAnimate = shouldAnimate;
+            this.shouldAnimate = shouldAnimate ?? (() => Application.isPlaying);
         }
 
-        public bool ShouldAnimate => shouldAnimate == null || shouldAnimate();
+        public bool ShouldAnimate => shouldAnimate();
     }
 }

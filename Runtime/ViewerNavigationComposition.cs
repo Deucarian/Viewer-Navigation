@@ -1,26 +1,31 @@
 using System;
+using Deucarian.CameraNavigation;
+using Deucarian.Theming;
 using UnityEngine;
 
 namespace Deucarian.ViewerNavigation
 {
     /// <summary>
-    /// Shared default composition values used by multiple consumers to keep navigation feel
-    /// identical.
+    /// Resolves the canonical reusable navigation preset and its runtime policies.
     /// </summary>
     public static class ViewerNavigationReferenceComposition
     {
         /// <summary>
-        /// Compose the canonical reusable preset and helpers used by Report Viewer,
-        /// Activity Viewer, and template consumers.
+        /// Compose the canonical reusable preset and helpers used by reference-viewer
+        /// consumers.
         /// </summary>
         public static ViewerNavigationReferenceCompositionProfile Resolve(
             IViewerNavigationAnimationPolicy animationPolicy = null)
         {
+            DeucarianViewerReferenceThemeProfile themeProfile =
+                DeucarianViewerReferenceThemePreset.Resolve();
             return new ViewerNavigationReferenceCompositionProfile(
                 ViewerNavigationSettings.LoadReferencePreset(),
                 new ViewerNavigationUiInputBlocker(),
-                new DeucarianMeshBoundsStrategy(),
-                animationPolicy);
+                new ViewerNavigationMeshBoundsStrategy(),
+                animationPolicy ?? new ViewerNavigationAnimationPolicy(),
+                themeProfile,
+                DeucarianViewerReferenceThemePreset.DefaultMode);
         }
     }
 
@@ -33,31 +38,55 @@ namespace Deucarian.ViewerNavigation
             ViewerNavigationSettings preset,
             IViewerNavigationInputBlocker inputBlocker,
             IDeucarianFramingBoundsStrategy<GameObject> boundsStrategy,
-            IViewerNavigationAnimationPolicy animationPolicy)
+            IViewerNavigationAnimationPolicy animationPolicy,
+            DeucarianViewerReferenceThemeProfile themeProfile,
+            DeucarianThemeMode themeMode)
         {
             if (preset == null)
             {
                 throw new ArgumentNullException(nameof(preset));
             }
 
+            if (themeProfile == null)
+            {
+                throw new ArgumentNullException(nameof(themeProfile));
+            }
+
             Preset = preset;
             InputBlocker = inputBlocker;
             BoundsStrategy = boundsStrategy;
             AnimationPolicy = animationPolicy;
+            ThemeProfile = themeProfile;
+            ThemeMode = themeMode;
         }
 
         public ViewerNavigationSettings Preset { get; }
         public IViewerNavigationInputBlocker InputBlocker { get; }
         public IDeucarianFramingBoundsStrategy<GameObject> BoundsStrategy { get; }
         public IViewerNavigationAnimationPolicy AnimationPolicy { get; }
+        public DeucarianViewerReferenceThemeProfile ThemeProfile { get; }
+        public DeucarianThemeMode ThemeMode { get; }
 
-        public ViewerNavigationInstaller Compose(Transform parent, Camera camera) =>
-            ViewerNavigationInstaller.Create(
-                parent,
-                camera,
-                Preset,
+        /// <summary>
+        /// Returns the same reference composition with an intentional settings override.
+        /// Runtime policy and theme object identities are preserved.
+        /// </summary>
+        public ViewerNavigationReferenceCompositionProfile WithPreset(
+            ViewerNavigationSettings preset)
+        {
+            return new ViewerNavigationReferenceCompositionProfile(
+                preset,
                 InputBlocker,
                 BoundsStrategy,
-                AnimationPolicy);
+                AnimationPolicy,
+                ThemeProfile,
+                ThemeMode);
+        }
+
+        public ViewerNavigationInstaller Compose(Transform parent, Camera camera) =>
+            ViewerNavigationInstaller.CreateWithReferenceComposition(
+                parent,
+                camera,
+                this);
     }
 }

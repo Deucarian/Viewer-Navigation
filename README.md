@@ -4,7 +4,7 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.4`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.5`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -17,42 +17,43 @@ loading, browser transport, or application selection behavior.
 
 ## Runtime composition
 
-Create a `ViewerNavigationInstaller` from an application composition root, pass the
-camera and project-owned settings explicitly, and register reference bounds only after
-the model has completed placement:
+Create the canonical reference composition from an application composition root and
+register reference bounds only after the model has completed placement:
 
 ```csharp
-ViewerNavigationInstaller navigation = ViewerNavigationInstaller.Create(
-    transform,
-    viewerCamera,
-    navigationControls,
-    inputSettings,
-    motionProfile,
-    framingSettings,
-    inputBlocker,
-    referenceBoundsStrategy);
+ViewerNavigationReferenceCompositionProfile composition =
+    ViewerNavigationReferenceComposition.Resolve();
+ViewerNavigationInstaller navigation =
+    composition.Compose(transform, viewerCamera);
 navigation.BeginReferenceLoad();
 navigation.RegisterReference(loadedModelRoot, frame: true, captureOrigin: true);
 ```
 
-The overload taking `ViewerNavigationSettings` is useful for scene-authored projects.
-Passing `null` selects the packaged canonical reference preset, whose navigation and
-framing tuning is the Report Viewer-proven default. Supply another settings asset only
-for an intentional product variation.
-The dependency-explicit overload above is preferred for application composition roots
-because each policy can be supplied and tested independently. Reinitializing an
-installer is supported; it detaches old event subscriptions and cancels active camera
-transitions before applying the replacement dependencies.
+`Resolve()` supplies the packaged settings, UI input blocker, MeshRenderer-only bounds
+strategy, non-null runtime-only animation policy, and canonical dark Frosted Glass theme
+as one reusable profile. `Compose()` installs the matching theme provider before the
+toolbar is initialized. A host can pass a `ViewerNavigationAnimationPolicy` when it
+needs to connect an accessibility preference without forking the preset's timing or
+curves. Use `WithPreset(settings)` for an intentional navigation-settings variation
+while retaining the exact shared input, bounds, animation, and theme objects.
+Reinitializing an installer is supported; it detaches old event subscriptions and
+cancels active camera transitions before applying the replacement dependencies.
 
 ## Public contract
 
 - `ViewerNavigationInstaller` owns scene composition and late model registration.
+- `ViewerNavigationReferenceComposition` resolves the canonical settings and runtime
+  policies, including the reference theme family and mode, as one reusable profile.
 - `ViewerNavigationController` is the single authoritative owner of navigation mode,
   top-down state, reference bounds, origin, and active transition state.
 - `ViewerNavigationSnapshot` is the immutable state notification contract.
 - `IViewerNavigationMotionProfile` supplies application-specific timing and easing.
 - `IViewerNavigationAnimationPolicy` lets a host gate the shared motion preset for an
   accessibility preference without forking its timing or curves.
+- `ViewerNavigationUiInputBlocker` applies the shared EventSystem and UI Toolkit input
+  policy.
+- `ViewerNavigationMeshBoundsStrategy` preserves the reference MeshRenderer-only bounds
+  policy.
 - `IViewerNavigationInputBlocker` lets a host block input without coupling this package
   to application UI.
 - `IDeucarianFramingBoundsStrategy<GameObject>` lets a host preserve its proven

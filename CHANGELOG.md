@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.5 - 2026-08-17
+
+- Added one canonical reference composition for the packaged navigation settings,
+  animation policy, UI input blocker, MeshRenderer-only bounds strategy, and shared
+  reference-viewer theme profile.
+- Made the default reference animation policy explicit, non-null, and runtime-only while
+  retaining an injectable accessibility gate for host applications.
+- Reference composition now installs the canonical dark Frosted Glass theme provider
+  before toolbar initialization, while non-reference installer overloads remain
+  unthemed.
+- Added focused regressions for composition injection, motion-policy reevaluation,
+  reference bounds, and UI input classification.
+
 ## 0.1.4 - 2026-08-17
 
 - Restored the polished Report Viewer navigation toolbar as shared package behavior:

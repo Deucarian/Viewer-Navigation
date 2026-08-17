@@ -52,6 +52,8 @@ namespace Deucarian.ViewerNavigation
             ReferenceBoundsStrategy => referenceBoundsStrategy;
         public IViewerNavigationMotionProfile MotionProfile => motionProfile;
         public ViewerNavigationInteractionGate InteractionGate => interactionGate;
+        internal IViewerNavigationInputBlocker InputBlocker =>
+            externalInputBlocker;
 
         public void Initialize(
             Camera camera,

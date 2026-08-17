@@ -4,9 +4,10 @@ using UnityEngine;
 namespace Deucarian.ViewerNavigation
 {
     /// <summary>
-    /// Mesh-renderer based reference bounds policy shared by production navigation consumers.
+    /// Mesh-renderer based reference bounds policy shared by production navigation
+    /// consumers.
     /// </summary>
-    public sealed class DeucarianMeshBoundsStrategy :
+    public sealed class ViewerNavigationMeshBoundsStrategy :
         IDeucarianFramingBoundsStrategy<GameObject>
     {
         public bool TryGetBounds(GameObject source, out Bounds bounds)

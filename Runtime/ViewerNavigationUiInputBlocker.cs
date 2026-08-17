@@ -29,13 +29,11 @@ namespace Deucarian.ViewerNavigation
 
                 Vector2 panelPosition = RuntimePanelUtils.ScreenToPanel(
                     root.panel,
-                    new Vector2(
-                        screenPosition.x,
-                        Screen.height - screenPosition.y));
+                    ToTopLeftScreenPosition(screenPosition, Screen.height));
                 VisualElement picked = root.panel.Pick(panelPosition);
-                if (picked != null &&
-                    picked != root.panel.visualTree &&
-                    picked.pickingMode != PickingMode.Ignore)
+                if (IsPanelPickBlockingInput(
+                        picked,
+                        root.panel.visualTree))
                 {
                     return true;
                 }
@@ -71,7 +69,26 @@ namespace Deucarian.ViewerNavigation
             return false;
         }
 
-        private static bool IsKeyboardInteractiveElement(VisualElement element)
+        internal static Vector2 ToTopLeftScreenPosition(
+            Vector2 screenPosition,
+            float screenHeight)
+        {
+            return new Vector2(
+                screenPosition.x,
+                screenHeight - screenPosition.y);
+        }
+
+        internal static bool IsPanelPickBlockingInput(
+            VisualElement picked,
+            VisualElement panelRoot)
+        {
+            return picked != null &&
+                   picked != panelRoot &&
+                   picked.pickingMode != PickingMode.Ignore;
+        }
+
+        internal static bool IsKeyboardInteractiveElement(
+            VisualElement element)
         {
             for (VisualElement current = element;
                  current != null;
