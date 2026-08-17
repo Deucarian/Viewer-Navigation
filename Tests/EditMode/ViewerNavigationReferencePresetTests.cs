@@ -84,6 +84,51 @@ namespace Deucarian.ViewerNavigation.Tests
         }
 
         [Test]
+        public void ReferencePresetCompositionInjectsSharedNavigationHelpers()
+        {
+            ViewerNavigationReferenceCompositionProfile composition =
+                ViewerNavigationReferenceComposition.Resolve();
+
+            Assert.That(composition.Preset, Is.Not.Null);
+            Assert.That(composition.Preset, Is.SameAs(ViewerNavigationSettings.LoadReferencePreset()));
+            Assert.That(composition.InputBlocker, Is.TypeOf<ViewerNavigationUiInputBlocker>());
+            Assert.That(composition.BoundsStrategy, Is.TypeOf<DeucarianMeshBoundsStrategy>());
+        }
+
+        [Test]
+        public void CreateWithReferencePresetHonorsSharedAnimationPolicy()
+        {
+            bool shouldAnimate = false;
+            ViewerNavigationSettings preset = ViewerNavigationSettings.LoadReferencePreset();
+            var policy = new ViewerNavigationAnimationPolicy(() => shouldAnimate);
+            GameObject root = new GameObject("Reference Preset Motion Policy Test");
+            GameObject cameraObject = new GameObject("Reference Preset Motion Policy Camera");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            try
+            {
+                ViewerNavigationInstaller installer =
+                    ViewerNavigationInstaller.CreateWithReferencePreset(
+                        root.transform,
+                        camera,
+                        policy);
+
+                Assert.That(installer.Controller.MotionProfile.AnimateTransitions, Is.False);
+                Assert.That(installer.Controller.MotionProfile.CalculateTransitionDuration(1f), Is.Zero);
+
+                shouldAnimate = true;
+                Assert.That(installer.Controller.MotionProfile.AnimateTransitions, Is.True);
+                Assert.That(
+                    installer.Controller.MotionProfile.CalculateTransitionDuration(1f),
+                    Is.EqualTo(preset.CalculateTransitionDuration(1f)));
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+                Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [Test]
         public void ViewCubeIsDisabledByDefaultAndCanBeExplicitlyEnabled()
         {
             GameObject root = new GameObject("View Cube Opt In Test");

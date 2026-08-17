@@ -46,6 +46,22 @@ namespace Deucarian.ViewerNavigation
             return installer;
         }
 
+        public static ViewerNavigationInstaller CreateWithReferencePreset(
+            Transform parent,
+            Camera camera,
+            IViewerNavigationAnimationPolicy animationPolicy = null)
+        {
+            ViewerNavigationReferenceCompositionProfile referencePreset =
+                ViewerNavigationReferenceComposition.Resolve(animationPolicy);
+            return Create(
+                parent,
+                camera,
+                referencePreset.Preset,
+                referencePreset.InputBlocker,
+                referencePreset.BoundsStrategy,
+                referencePreset.AnimationPolicy);
+        }
+
         public static ViewerNavigationInstaller Create(
             Transform parent,
             Camera camera,
