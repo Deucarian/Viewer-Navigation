@@ -6,6 +6,7 @@
 3. Enter Play Mode.
 
 The sample initializes through an explicit composition root, registers the reference
-only after it is available, frames it, captures origin, and presents the shared toolbar
-and an optional six-face view cube, which is disabled by default. It contains no
+only after it is available, frames it, captures origin, and presents the shared
+Report Viewer-proven icon toolbar and an optional six-face view cube, which is
+disabled by default. It contains no
 report, activity, backend, or browser DTOs.
