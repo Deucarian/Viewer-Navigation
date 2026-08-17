@@ -7,4 +7,5 @@
 
 The sample initializes through an explicit composition root, registers the reference
 only after it is available, frames it, captures origin, and presents the shared toolbar
-and six-face view cube. It contains no report, activity, backend, or browser DTOs.
+and an optional six-face view cube, which is disabled by default. It contains no
+report, activity, backend, or browser DTOs.

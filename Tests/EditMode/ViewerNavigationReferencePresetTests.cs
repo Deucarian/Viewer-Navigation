@@ -1,3 +1,4 @@
+using System.Reflection;
 using Deucarian.CameraNavigation;
 using NUnit.Framework;
 using UnityEngine;
@@ -28,7 +29,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 Is.EqualTo(0.75f).Within(0.0001f));
             Assert.That(preset.ReferencePadding, Is.EqualTo(1.25f));
             Assert.That(preset.ShowToolbar, Is.True);
-            Assert.That(preset.ShowViewCube, Is.True);
+            Assert.That(preset.ShowViewCube, Is.False);
             Assert.That(preset.Controls.GlobalSensitivity, Is.EqualTo(10f));
             Assert.That(preset.Controls.OrbitKeyboardPanSpeed, Is.EqualTo(0.9f));
             Assert.That(preset.Controls.OrbitRotationSpeed, Is.EqualTo(0.35f));
@@ -73,10 +74,50 @@ namespace Deucarian.ViewerNavigation.Tests
                     installer.Controller.FramingSettings,
                     Is.SameAs(preset.FramingSettings));
                 Assert.That(installer.Toolbar, Is.Not.Null);
-                Assert.That(installer.Toolbar.ViewCube, Is.Not.Null);
+                Assert.That(installer.Toolbar.ViewCube, Is.Null);
             }
             finally
             {
+                Object.DestroyImmediate(root);
+                Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [Test]
+        public void ViewCubeIsDisabledByDefaultAndCanBeExplicitlyEnabled()
+        {
+            GameObject root = new GameObject("View Cube Opt In Test");
+            GameObject cameraObject = new GameObject("Camera");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            ViewerNavigationSettings settings =
+                ScriptableObject.CreateInstance<ViewerNavigationSettings>();
+            try
+            {
+                Assert.That(settings.ShowViewCube, Is.False);
+
+                FieldInfo field = typeof(ViewerNavigationSettings).GetField(
+                    "showViewCube",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+                Assert.That(field, Is.Not.Null);
+                field.SetValue(settings, true);
+
+                ViewerNavigationInstaller installer =
+                    ViewerNavigationInstaller.Create(
+                        root.transform,
+                        camera,
+                        settings);
+
+                Assert.That(installer.Toolbar, Is.Not.Null);
+                Assert.That(installer.Toolbar.ViewCube, Is.Not.Null);
+
+                field.SetValue(settings, false);
+                installer.Toolbar.Initialize(installer.Controller, settings);
+
+                Assert.That(installer.Toolbar.ViewCube, Is.Null);
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
                 Object.DestroyImmediate(root);
                 Object.DestroyImmediate(cameraObject);
             }
