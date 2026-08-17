@@ -70,4 +70,4 @@ MonoBehaviour:
     m_RotationOrder: 4
   referencePadding: 1.25
   showToolbar: 1
-  showViewCube: 1
+  showViewCube: 0
