@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.6 - 2026-08-17
+
+- Made the default reference animation policy honor the browser's generic
+  `prefers-reduced-motion` preference in WebGL as well as runtime state.
+- Added package-owned, defensive WebGL motion-preference interop so Report Viewer,
+  Activity Viewer, and reusable templates no longer need consumer-specific gates.
+- Added deterministic policy coverage for every play-mode and reduced-motion state.
+
 ## 0.1.5 - 2026-08-17
 
 - Added one canonical reference composition for the packaged navigation settings,

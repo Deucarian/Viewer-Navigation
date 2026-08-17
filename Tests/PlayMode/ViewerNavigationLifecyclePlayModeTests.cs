@@ -8,6 +8,20 @@ namespace Deucarian.ViewerNavigation.Tests
     public sealed class ViewerNavigationLifecyclePlayModeTests
     {
         [UnityTest]
+        public IEnumerator DefaultMotionPreferenceAnimatesDuringPlayMode()
+        {
+            yield return null;
+
+            Assert.That(Application.isPlaying, Is.True);
+            Assert.That(
+                ViewerNavigationMotionPreferences.PrefersReducedMotion,
+                Is.False);
+            Assert.That(
+                new ViewerNavigationAnimationPolicy().ShouldAnimate,
+                Is.True);
+        }
+
+        [UnityTest]
         public IEnumerator NewFaceActionSupersedesActiveTransition()
         {
             GameObject root = new GameObject("Navigation");

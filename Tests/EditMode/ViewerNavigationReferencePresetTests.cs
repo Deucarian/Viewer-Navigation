@@ -1,3 +1,4 @@
+using System.IO;
 using System.Reflection;
 using Deucarian.CameraNavigation;
 using Deucarian.Theming;
@@ -248,18 +249,67 @@ namespace Deucarian.ViewerNavigation.Tests
         }
 
         [Test]
-        public void AnimationPolicyDefaultsToRuntimeOnlyAndReevaluatesItsDelegate()
+        public void AnimationPolicyDefaultsToSharedMotionPreferenceAndReevaluatesItsDelegate()
         {
             var defaultPolicy = new ViewerNavigationAnimationPolicy();
-            Assert.That(defaultPolicy.ShouldAnimate, Is.EqualTo(Application.isPlaying));
+            Assert.That(
+                defaultPolicy.ShouldAnimate,
+                Is.EqualTo(ViewerNavigationMotionPreferences.ShouldAnimate));
+            Assert.That(defaultPolicy.UsesSharedMotionPreference, Is.True);
 
             bool shouldAnimate = false;
             var delegatedPolicy = new ViewerNavigationAnimationPolicy(
                 () => shouldAnimate);
+            Assert.That(delegatedPolicy.UsesSharedMotionPreference, Is.False);
             Assert.That(delegatedPolicy.ShouldAnimate, Is.False);
 
             shouldAnimate = true;
             Assert.That(delegatedPolicy.ShouldAnimate, Is.True);
+        }
+
+        [TestCase(false, false, false)]
+        [TestCase(false, true, false)]
+        [TestCase(true, false, true)]
+        [TestCase(true, true, false)]
+        public void SharedMotionPreferenceRequiresRuntimeWithoutReducedMotion(
+            bool isPlaying,
+            bool prefersReducedMotion,
+            bool expected)
+        {
+            Assert.That(
+                ViewerNavigationMotionPreferences.ResolveShouldAnimate(
+                    isPlaying,
+                    prefersReducedMotion),
+                Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void WebGlMotionPreferenceInteropIsDefensiveAndConsumerNeutral()
+        {
+            UnityEditor.PackageManager.PackageInfo package =
+                UnityEditor.PackageManager.PackageInfo.FindForAssembly(
+                    typeof(ViewerNavigationAnimationPolicy).Assembly);
+            Assert.That(package, Is.Not.Null);
+            string plugin = File.ReadAllText(
+                Path.Combine(
+                    package.resolvedPath,
+                    "Runtime",
+                    "Plugins",
+                    "WebGL",
+                    "DeucarianViewerNavigation.jslib"));
+
+            StringAssert.Contains(
+                "DeucarianViewerNavigationPrefersReducedMotion",
+                plugin);
+            StringAssert.Contains(
+                "(prefers-reduced-motion: reduce)",
+                plugin);
+            StringAssert.Contains(
+                "typeof window.matchMedia !== \"function\"",
+                plugin);
+            StringAssert.Contains("catch (error)", plugin);
+            StringAssert.DoesNotContain("Report", plugin);
+            StringAssert.DoesNotContain("Activity", plugin);
         }
 
         [Test]

@@ -1,6 +1,6 @@
 {
   "name": "com.deucarian.viewer-navigation",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "displayName": "Deucarian Viewer Navigation",
   "description": "Reusable viewer navigation experience composing camera navigation, Input System controls, pointer capture, UI, theming, logging, and diagnostics.",
   "unity": "2022.3",

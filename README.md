@@ -4,7 +4,7 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.5`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.6`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -30,11 +30,13 @@ navigation.RegisterReference(loadedModelRoot, frame: true, captureOrigin: true);
 ```
 
 `Resolve()` supplies the packaged settings, UI input blocker, MeshRenderer-only bounds
-strategy, non-null runtime-only animation policy, and canonical dark Frosted Glass theme
-as one reusable profile. `Compose()` installs the matching theme provider before the
-toolbar is initialized. A host can pass a `ViewerNavigationAnimationPolicy` when it
-needs to connect an accessibility preference without forking the preset's timing or
-curves. Use `WithPreset(settings)` for an intentional navigation-settings variation
+strategy, non-null runtime animation policy, and canonical dark Frosted Glass theme as
+one reusable profile. The default policy also honors WebGL
+`prefers-reduced-motion`, so every consumer gets the same accessibility behavior.
+`Compose()` installs the matching theme provider before the toolbar is initialized. A
+host can still pass a `ViewerNavigationAnimationPolicy` for a deliberate application
+override without forking the preset's timing or curves. Use `WithPreset(settings)` for
+an intentional navigation-settings variation
 while retaining the exact shared input, bounds, animation, and theme objects.
 Reinitializing an installer is supported; it detaches old event subscriptions and
 cancels active camera transitions before applying the replacement dependencies.
@@ -48,8 +50,10 @@ cancels active camera transitions before applying the replacement dependencies.
   top-down state, reference bounds, origin, and active transition state.
 - `ViewerNavigationSnapshot` is the immutable state notification contract.
 - `IViewerNavigationMotionProfile` supplies application-specific timing and easing.
-- `IViewerNavigationAnimationPolicy` lets a host gate the shared motion preset for an
-  accessibility preference without forking its timing or curves.
+- `ViewerNavigationMotionPreferences` provides the shared runtime and WebGL reduced-
+  motion decision used by the default reference policy.
+- `IViewerNavigationAnimationPolicy` lets a host deliberately override the shared
+  motion gate without forking its timing or curves.
 - `ViewerNavigationUiInputBlocker` applies the shared EventSystem and UI Toolkit input
   policy.
 - `ViewerNavigationMeshBoundsStrategy` preserves the reference MeshRenderer-only bounds

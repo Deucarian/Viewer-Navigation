@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace Deucarian.ViewerNavigation
 {
@@ -12,8 +11,16 @@ namespace Deucarian.ViewerNavigation
 
         public ViewerNavigationAnimationPolicy(Func<bool> shouldAnimate = null)
         {
-            this.shouldAnimate = shouldAnimate ?? (() => Application.isPlaying);
+            UsesSharedMotionPreference = shouldAnimate == null;
+            this.shouldAnimate = shouldAnimate ??
+                (() => ViewerNavigationMotionPreferences.ShouldAnimate);
         }
+
+        /// <summary>
+        /// True when this policy uses the package-owned runtime and browser
+        /// accessibility preference rather than a host override.
+        /// </summary>
+        public bool UsesSharedMotionPreference { get; }
 
         public bool ShouldAnimate => shouldAnimate();
     }
