@@ -1,5 +1,6 @@
 using Deucarian.Diagnostics;
 using Deucarian.PointerCapture;
+using Deucarian.ViewerNavigation.UI;
 
 namespace Deucarian.ViewerNavigation
 {
@@ -59,6 +60,8 @@ namespace Deucarian.ViewerNavigation
                         : "Idle")
                 .AddItem("revision", "State Revision", snapshot.Revision.ToString());
 
+            CollectToolbarHealth(section);
+
             DeucarianPointerCaptureController capture =
                 controller.InteractionGate != null
                     ? controller.InteractionGate.PointerCapture
@@ -72,6 +75,52 @@ namespace Deucarian.ViewerNavigation
                     "Pointer Capture",
                     pointer.State.ToString());
             }
+        }
+
+        private void CollectToolbarHealth(DiagnosticSection section)
+        {
+            ViewerNavigationToolbarPresenter toolbar =
+                controller.GetComponent<ViewerNavigationToolbarPresenter>();
+            if (toolbar == null)
+            {
+                section.AddItem(
+                    "toolbar_component",
+                    "Toolbar Component",
+                    "Not installed",
+                    DiagnosticSeverity.Info);
+                return;
+            }
+
+            section.AddItem(
+                "toolbar_document",
+                "Toolbar Document",
+                toolbar.Document != null && toolbar.Document.enabled
+                    ? "Ready"
+                    : "Missing",
+                toolbar.Document != null && toolbar.Document.enabled
+                    ? DiagnosticSeverity.Info
+                    : DiagnosticSeverity.Error);
+            section.AddItem(
+                "toolbar_assets",
+                "Toolbar Assets",
+                toolbar.HasAttachedPresentationAssets
+                    ? "Loaded"
+                    : "Missing or detached",
+                toolbar.HasAttachedPresentationAssets
+                    ? DiagnosticSeverity.Info
+                    : DiagnosticSeverity.Error);
+
+            bool controlsHealthy = !toolbar.IsToolbarExpected ||
+                                   toolbar.HasRequiredToolbarControls;
+            section.AddItem(
+                "toolbar_controls",
+                "Toolbar Controls",
+                !toolbar.IsToolbarExpected
+                    ? "Disabled by settings"
+                    : controlsHealthy ? "Complete" : "Incomplete",
+                controlsHealthy
+                    ? DiagnosticSeverity.Info
+                    : DiagnosticSeverity.Error);
         }
     }
 }

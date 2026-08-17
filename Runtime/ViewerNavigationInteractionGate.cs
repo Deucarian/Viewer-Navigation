@@ -52,6 +52,21 @@ namespace Deucarian.ViewerNavigation
             isTopDown = topDown;
         }
 
+        internal bool IsNavigationMovementKeyActive()
+        {
+            if (actionStateSource == null)
+            {
+                return false;
+            }
+
+            return actionStateSource.ReadActionState(
+                    isTopDown || mode == ViewerNavigationMode.Orbit
+                        ? DeucarianInputSystemNavigationMode.Orbit
+                        : DeucarianInputSystemNavigationMode.Fly,
+                    isTopDown)
+                .HasKeyboardAction;
+        }
+
         public IDisposable RegisterUiRoot(VisualElement root)
         {
             if (root == null)

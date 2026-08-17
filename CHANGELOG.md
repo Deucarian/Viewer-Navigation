@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.7 - 2026-08-17
+
+- Moved the complete canonical reference navigation toolbar into package-owned UXML,
+  USS, and transparent scale-with-screen-size PanelSettings assets.
+- Matched the proven control-island layout, semantic accent selection, icon swapping,
+  tooltips, pointer picking, focus behavior, and motion while keeping every name and
+  dependency consumer-neutral.
+- Added panel-shared movement-key suppression so WASD, arrows, Q/E, and page movement
+  never activate focused UI controls while accessibility and gamepad navigation remain
+  available.
+- Made Theming the source of theme, style, and typography and UI the source of glass,
+  density, chrome, icon interaction, and motion primitives.
+- Added package-level presentation, asset-ownership, provider-style, input, and
+  movement-key regressions for all viewer consumers.
+
 ## 0.1.6 - 2026-08-17
 
 - Made the default reference animation policy honor the browser's generic

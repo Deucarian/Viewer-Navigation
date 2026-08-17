@@ -23,6 +23,7 @@ namespace Deucarian.ViewerNavigation.UI
         private readonly VisualElement root;
         private readonly VisualElement bubble;
         private readonly Label label;
+        private readonly Component themeContext;
         private readonly List<VisualElement> targets = new List<VisualElement>();
         private IVisualElementScheduledItem pendingShow;
         private IVisualElementScheduledItem pendingPointerActivationClear;
@@ -32,8 +33,11 @@ namespace Deucarian.ViewerNavigation.UI
         private bool anchorFromFocus;
         private bool visible;
 
-        public ViewerNavigationRuntimeTooltipPresenter(VisualElement tooltipRoot)
+        public ViewerNavigationRuntimeTooltipPresenter(
+            Component context,
+            VisualElement tooltipRoot)
         {
+            themeContext = context;
             root = tooltipRoot;
             if (root == null)
             {
@@ -87,14 +91,19 @@ namespace Deucarian.ViewerNavigation.UI
             target.RegisterCallback<FocusOutEvent>(OnFocusOut);
         }
 
-        public void ApplyTheme(DeucarianTheme theme)
+        public void ApplyTheme(
+            DeucarianTheme theme,
+            DeucarianThemeStyle style)
         {
             if (bubble == null)
             {
                 return;
             }
 
-            DeucarianThemeStyle style = theme != null ? theme.VisualStyle : null;
+            DeucarianUIToolkitThemeTypography.Apply(
+                bubble,
+                theme,
+                themeContext);
             if (!DeucarianUIToolkitThemeStyleUtility.ApplyPanel(
                     bubble,
                     theme,

@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="DeucarianViewerNavigationRoot" class="deucarian-viewer-navigation-root">
+        <ui:VisualElement name="DeucarianViewerNavigationToolbar" class="deucarian-viewer-navigation-toolbar deucarian-viewer-navigation-glass">
+            <ui:Button name="OrbitButton" text="" focusable="true" class="deucarian-viewer-navigation-button deucarian-viewer-navigation-button--inactive">
+                <ui:VisualElement name="OrbitIcon" class="deucarian-viewer-navigation-icon deucarian-viewer-navigation-icon--orbit" />
+            </ui:Button>
+            <ui:Button name="FlyButton" text="" focusable="true" class="deucarian-viewer-navigation-button deucarian-viewer-navigation-button--inactive">
+                <ui:VisualElement name="FlyIcon" class="deucarian-viewer-navigation-icon deucarian-viewer-navigation-icon--fly" />
+            </ui:Button>
+            <ui:Button name="HomeButton" text="" focusable="true" class="deucarian-viewer-navigation-button deucarian-viewer-navigation-button--inactive">
+                <ui:VisualElement name="HomeIcon" class="deucarian-viewer-navigation-icon deucarian-viewer-navigation-icon--recenter" />
+            </ui:Button>
+            <ui:Button name="TopDownButton" text="" focusable="true" class="deucarian-viewer-navigation-button deucarian-viewer-navigation-button--inactive">
+                <ui:VisualElement name="TopDownIcon" class="deucarian-viewer-navigation-icon deucarian-viewer-navigation-icon--orthographic" />
+                <ui:VisualElement name="PerspectiveIcon" class="deucarian-viewer-navigation-icon deucarian-viewer-navigation-icon--perspective" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
+

@@ -93,7 +93,7 @@ namespace Deucarian.ViewerNavigation.Tests
     public sealed class ViewerNavigationToolbarPresenterTests
     {
         [Test]
-        public void ToolbarHasExplicitCenteredWidthForRuntimePanels()
+        public void ToolbarUsesCenteredReferenceControlIslandLayout()
         {
             var gameObject = new GameObject("Viewer Navigation Toolbar Test");
             try
@@ -108,7 +108,16 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(toolbar.style.width.value.value, Is.GreaterThan(0f));
                 Assert.That(
                     toolbar.style.marginLeft.value.value,
-                    Is.EqualTo(-toolbar.style.width.value.value * 0.5f));
+                    Is.Zero);
+                Assert.That(
+                    presenter.Root.style.alignItems.value,
+                    Is.EqualTo(Align.Center));
+                Assert.That(
+                    presenter.Root.style.justifyContent.value,
+                    Is.EqualTo(Justify.FlexEnd));
+                Assert.That(
+                    presenter.Root.style.paddingBottom.value.value,
+                    Is.GreaterThan(0f));
                 Assert.That(toolbar.Query<Button>().ToList(), Has.Count.EqualTo(4));
             }
             finally
@@ -118,7 +127,7 @@ namespace Deucarian.ViewerNavigation.Tests
         }
 
         [Test]
-        public void ToolbarUsesReportProvenIconsAndTooltipsInsteadOfLetters()
+        public void ToolbarUsesCanonicalIconsAndTooltipsInsteadOfLetters()
         {
             var gameObject = new GameObject("Viewer Navigation Toolbar Test");
             try
@@ -203,6 +212,70 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(
                     perspectiveIcon.style.display.value,
                     Is.EqualTo(DisplayStyle.None));
+            }
+            finally
+            {
+                state.Dispose();
+                Object.DestroyImmediate(gameObject);
+            }
+        }
+
+        [Test]
+        public void EnterTopDownTransitionTargetsIconBeforeStateCommit()
+        {
+            ViewerNavigationSnapshot entering =
+                new ViewerNavigationSnapshot(
+                    ViewerNavigationMode.Orbit,
+                    false,
+                    false,
+                    false,
+                    true,
+                    ViewerNavigationTransitionKind.EnterTopDown,
+                    1);
+            ViewerNavigationSnapshot exiting =
+                new ViewerNavigationSnapshot(
+                    ViewerNavigationMode.Orbit,
+                    true,
+                    false,
+                    false,
+                    true,
+                    ViewerNavigationTransitionKind.ExitTopDown,
+                    2);
+
+            Assert.That(
+                ViewerNavigationToolbarVisualState
+                    .ResolvePresentedTopDown(entering),
+                Is.True);
+            Assert.That(
+                ViewerNavigationToolbarVisualState
+                    .ResolvePresentedTopDown(exiting),
+                Is.False);
+        }
+
+        [Test]
+        public void InteractionAnimationUsesInjectedMotionPolicyDynamically()
+        {
+            var gameObject = new GameObject("Toolbar Motion Policy Test");
+            var state = new ViewerNavigationToolbarVisualState();
+            bool shouldAnimate = false;
+            try
+            {
+                state.Initialize(
+                    gameObject.AddComponent<ViewerNavigationToolbarPresenter>(),
+                    new Button(),
+                    new Button(),
+                    new Button(),
+                    new Button(),
+                    new VisualElement(),
+                    new VisualElement(),
+                    new VisualElement(),
+                    new VisualElement(),
+                    new VisualElement(),
+                    () => shouldAnimate);
+
+                Assert.That(state.ShouldAnimateInteractions, Is.False);
+                shouldAnimate = true;
+                Assert.That(state.ShouldAnimateInteractions, Is.True);
             }
             finally
             {
