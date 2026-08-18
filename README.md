@@ -4,7 +4,7 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.9`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.10`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -38,8 +38,11 @@ navigation.RegisterReference(loadedModelRoot, frame: true, captureOrigin: true);
 strategy, non-null runtime animation policy, and canonical dark Frosted Glass theme as
 one reusable profile. The default policy also honors WebGL
 `prefers-reduced-motion`, so every consumer gets the same accessibility behavior.
-`Compose()` installs the matching theme provider before the toolbar is initialized. A
-host can still pass a `ViewerNavigationAnimationPolicy` for a deliberate application
+`Compose()` installs the matching theme provider before the toolbar is initialized.
+Whole-viewer shells should pass their authoritative `DeucarianThemeProvider` to the
+three-argument overload so every viewer document resolves one theme instance and
+navigation does not create a child provider. A host can still pass a
+`ViewerNavigationAnimationPolicy` for a deliberate application
 override without forking the preset's timing or curves. Use `WithPreset(settings)` for
 an intentional navigation-settings variation
 while retaining the exact shared input, bounds, animation, and theme objects.

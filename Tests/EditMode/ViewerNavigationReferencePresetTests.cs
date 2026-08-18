@@ -205,6 +205,104 @@ namespace Deucarian.ViewerNavigation.Tests
         }
 
         [Test]
+        public void ReferenceCompositionUsesInjectedAuthoritativeThemeProvider()
+        {
+            ViewerNavigationReferenceCompositionProfile composition =
+                ViewerNavigationReferenceComposition.Resolve();
+            GameObject root = new GameObject(
+                "Reference Shell Theme Provider Test");
+            GameObject cameraObject = new GameObject(
+                "Reference Shell Theme Provider Camera");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            DeucarianThemeProvider authoritativeProvider =
+                root.AddComponent<DeucarianThemeProvider>();
+            try
+            {
+                ViewerNavigationInstaller installer = composition.Compose(
+                    root.transform,
+                    camera,
+                    authoritativeProvider);
+
+                Assert.That(
+                    installer.ThemeProvider,
+                    Is.SameAs(authoritativeProvider));
+                Assert.That(
+                    installer.GetComponent<DeucarianThemeProvider>(),
+                    Is.Null,
+                    "Injected composition must not create a navigation-local " +
+                    "theme provider.");
+                Assert.That(
+                    authoritativeProvider.CurrentThemeFamily,
+                    Is.SameAs(composition.ThemeProfile.ThemeFamily));
+                Assert.That(
+                    authoritativeProvider.ThemeMode,
+                    Is.EqualTo(composition.ThemeMode));
+
+                FieldInfo boundProviderField = installer.Toolbar
+                    .GetType()
+                    .GetField(
+                        "themeProvider",
+                        BindingFlags.Instance | BindingFlags.NonPublic);
+                Assert.That(boundProviderField, Is.Not.Null);
+                Assert.That(
+                    boundProviderField.GetValue(installer.Toolbar),
+                    Is.SameAs(authoritativeProvider));
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+                Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [Test]
+        public void InjectedThemeProviderKeepsItsResolvedModeAndStyle()
+        {
+            ViewerNavigationReferenceCompositionProfile composition =
+                ViewerNavigationReferenceComposition.Resolve();
+            GameObject root = new GameObject(
+                "Reference Preserved Theme Provider Test");
+            GameObject cameraObject = new GameObject(
+                "Reference Preserved Theme Provider Camera");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            DeucarianThemeProvider authoritativeProvider =
+                root.AddComponent<DeucarianThemeProvider>();
+            DeucarianThemeStyle style =
+                ScriptableObject.CreateInstance<DeucarianThemeStyle>();
+            try
+            {
+                authoritativeProvider.SetThemeFamily(
+                    composition.ThemeProfile.ThemeFamily,
+                    DeucarianThemeMode.Light);
+                authoritativeProvider.SetStyle(style);
+
+                ViewerNavigationInstaller installer = composition.Compose(
+                    root.transform,
+                    camera,
+                    authoritativeProvider);
+
+                Assert.That(
+                    installer.ThemeProvider,
+                    Is.SameAs(authoritativeProvider));
+                Assert.That(
+                    authoritativeProvider.ThemeMode,
+                    Is.EqualTo(DeucarianThemeMode.Light));
+                Assert.That(
+                    authoritativeProvider.StyleOverride,
+                    Is.SameAs(style));
+                Assert.That(
+                    authoritativeProvider.CurrentTheme,
+                    Is.SameAs(composition.ThemeProfile.LightTheme));
+            }
+            finally
+            {
+                Object.DestroyImmediate(style);
+                Object.DestroyImmediate(root);
+                Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [Test]
         public void WithPresetPreservesAllPolicyAndThemeIdentities()
         {
             ViewerNavigationReferenceCompositionProfile composition =

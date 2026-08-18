@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.10 - 2026-08-18
+
+- Added authoritative theme-provider injection to the reference composition so
+  navigation, toolbar, and the reusable viewer shell can share one provider.
+- Preserved an injected provider's already-resolved family, mode, and style;
+  the reference preset now initializes only an empty provider.
+- Preserved the self-contained fallback for consumers that intentionally compose
+  navigation without a whole-viewer shell.
+
 ## 0.1.9 - 2026-08-18
 
 - Delegated navigation-toolbar document configuration and semantic depth to the

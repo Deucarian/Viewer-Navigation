@@ -88,5 +88,20 @@ namespace Deucarian.ViewerNavigation
                 parent,
                 camera,
                 this);
+
+        /// <summary>
+        /// Composes reference navigation against the viewer shell's authoritative
+        /// theme provider. This prevents a navigation child from creating a second,
+        /// independently configured provider.
+        /// </summary>
+        public ViewerNavigationInstaller Compose(
+            Transform parent,
+            Camera camera,
+            DeucarianThemeProvider themeProvider) =>
+            ViewerNavigationInstaller.CreateWithReferenceComposition(
+                parent,
+                camera,
+                this,
+                themeProvider);
     }
 }

@@ -41,20 +41,25 @@ namespace Deucarian.ViewerNavigation
         public static ViewerNavigationInstaller CreateWithReferencePreset(
             Transform parent,
             Camera camera,
-            IViewerNavigationAnimationPolicy animationPolicy = null)
+            IViewerNavigationAnimationPolicy animationPolicy = null,
+            DeucarianThemeProvider themeProvider = null)
         {
             ViewerNavigationReferenceCompositionProfile referencePreset =
                 ViewerNavigationReferenceComposition.Resolve(animationPolicy);
-            return referencePreset.Compose(parent, camera);
+            return referencePreset.Compose(parent, camera, themeProvider);
         }
 
         internal static ViewerNavigationInstaller CreateWithReferenceComposition(
             Transform parent,
             Camera camera,
-            ViewerNavigationReferenceCompositionProfile composition)
+            ViewerNavigationReferenceCompositionProfile composition,
+            DeucarianThemeProvider themeProvider = null)
         {
             ViewerNavigationInstaller installer = FindOrCreate(parent);
-            installer.InitializeReference(camera, composition);
+            installer.InitializeReference(
+                camera,
+                composition,
+                themeProvider);
             return installer;
         }
 
@@ -84,13 +89,15 @@ namespace Deucarian.ViewerNavigation
 
         private void InitializeReference(
             Camera camera,
-            ViewerNavigationReferenceCompositionProfile composition)
+            ViewerNavigationReferenceCompositionProfile composition,
+            DeucarianThemeProvider themeProvider)
         {
             settings = composition.Preset;
             navigationCamera = camera;
             EnsureReferenceThemeProvider(
                 composition.ThemeProfile,
-                composition.ThemeMode);
+                composition.ThemeMode,
+                themeProvider);
             EnsureComponents();
             Controller.Initialize(
                 camera,
@@ -178,17 +185,26 @@ namespace Deucarian.ViewerNavigation
 
         private void EnsureReferenceThemeProvider(
             DeucarianViewerReferenceThemeProfile themeProfile,
-            DeucarianThemeMode themeMode)
+            DeucarianThemeMode themeMode,
+            DeucarianThemeProvider authoritativeProvider)
         {
-            ThemeProvider = GetComponent<DeucarianThemeProvider>();
+            ThemeProvider = authoritativeProvider != null
+                ? authoritativeProvider
+                : GetComponent<DeucarianThemeProvider>();
             if (ThemeProvider == null)
             {
                 ThemeProvider = gameObject.AddComponent<DeucarianThemeProvider>();
             }
 
-            ThemeProvider.SetThemeFamily(
-                themeProfile.ThemeFamily,
-                themeMode);
+            // An injected provider is authoritative for the whole viewer. Keep
+            // a deliberate family/mode/style intact; initialize only an empty
+            // provider (including the navigation-owned fallback).
+            if (ThemeProvider.CurrentTheme == null)
+            {
+                ThemeProvider.SetThemeFamily(
+                    themeProfile.ThemeFamily,
+                    themeMode);
+            }
         }
 
         private static ViewerNavigationInstaller FindOrCreate(Transform parent)
