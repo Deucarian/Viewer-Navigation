@@ -1,3 +1,4 @@
+using Deucarian.UI;
 using Deucarian.ViewerNavigation.UI;
 using NUnit.Framework;
 using UnityEngine;
@@ -158,9 +159,17 @@ namespace Deucarian.ViewerNavigation.Tests
                     ViewerNavigationToolbarPresenter.TopDownTooltip);
 
                 Assert.That(
-                    presenter.Root.Q<VisualElement>(
-                        ViewerNavigationRuntimeTooltipPresenter.BubbleName),
+                    presenter.RuntimeTooltip.Bubble,
                     Is.Not.Null);
+                Assert.That(
+                    presenter.RuntimeTooltip.OverlayDocument.sortingOrder,
+                    Is.EqualTo(DeucarianUIDepth.Tooltip));
+                Assert.That(
+                    presenter.RuntimeTooltip.IsBound(
+                        presenter.Root.Q<Button>(
+                            ViewerNavigationToolbarPresenter
+                                .OrbitButtonName)),
+                    Is.True);
                 Assert.That(presenter.ViewCube, Is.Null);
             }
             finally

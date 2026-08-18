@@ -2,6 +2,7 @@ using System;
 using Deucarian.Common;
 using Deucarian.Theming;
 using Deucarian.Theming.UIToolkit;
+using Deucarian.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,8 +12,6 @@ namespace Deucarian.ViewerNavigation.UI
     {
         internal const string ToolbarAssetResourcesPath =
             "Deucarian/ViewerNavigationToolbar";
-        internal const string PanelSettingsResourcesPath =
-            "Deucarian/ViewerNavigationToolbarPanelSettings";
 
         private PanelSettings runtimePanelSettings;
         private VisualTreeAsset toolbarAsset;
@@ -29,7 +28,7 @@ namespace Deucarian.ViewerNavigation.UI
         private VisualElement topDownIcon;
         private VisualElement perspectiveIcon;
         private ViewerViewCubeElement viewCube;
-        private ViewerNavigationRuntimeTooltipPresenter runtimeTooltip;
+        private DeucarianRuntimeTooltipPresenter runtimeTooltip;
         private IDisposable movementKeyGuard;
         private VisualElement geometryRefreshRoot;
         private bool visualStateRefreshScheduled;
@@ -72,8 +71,8 @@ namespace Deucarian.ViewerNavigation.UI
                 ToolbarAssetResourcesPath);
             if (panelSettings == null)
             {
-                panelSettings = Resources.Load<PanelSettings>(
-                    PanelSettingsResourcesPath);
+                panelSettings = DeucarianUIRuntimeAssets
+                    .LoadRuntimePanelSettings();
             }
 
             if (toolbarAsset == null || toolbarStyleSheet == null)
@@ -114,7 +113,8 @@ namespace Deucarian.ViewerNavigation.UI
                 document.visualTreeAsset = toolbarAsset;
             }
 
-            document.sortingOrder = 1110;
+            document.sortingOrder =
+                DeucarianUIDepth.PrimaryControls;
         }
 
         private void BuildUi()
@@ -175,6 +175,8 @@ namespace Deucarian.ViewerNavigation.UI
                 viewCube.style.top = 20f;
                 viewCube.FaceSelected += OnFaceSelected;
                 root.Add(viewCube);
+                EnsureRuntimeTooltip();
+                runtimeTooltip.BindTree(viewCube);
             }
 
             RegisterGeometryRefresh(documentRoot);
@@ -244,12 +246,24 @@ namespace Deucarian.ViewerNavigation.UI
                 topDownIcon,
                 perspectiveIcon,
                 ShouldAnimateToolbarMotion);
-            runtimeTooltip =
-                new ViewerNavigationRuntimeTooltipPresenter(this, root);
+            EnsureRuntimeTooltip();
             runtimeTooltip.Bind(orbitButton);
             runtimeTooltip.Bind(flyButton);
             runtimeTooltip.Bind(homeButton);
             runtimeTooltip.Bind(topButton);
+        }
+
+        private void EnsureRuntimeTooltip()
+        {
+            if (runtimeTooltip != null)
+            {
+                return;
+            }
+
+            runtimeTooltip =
+                DeucarianRuntimeTooltipPresenter.CreateForDocument(
+                    this,
+                    document);
         }
 
         private void RemoveToolbar()

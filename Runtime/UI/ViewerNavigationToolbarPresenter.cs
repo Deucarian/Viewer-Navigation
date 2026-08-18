@@ -1,5 +1,6 @@
 using System;
 using Deucarian.Theming;
+using Deucarian.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -50,6 +51,8 @@ namespace Deucarian.ViewerNavigation.UI
         public VisualElement Root => root;
         public VisualElement ToolbarElement => toolbar;
         public ViewerViewCubeElement ViewCube => viewCube;
+        internal DeucarianRuntimeTooltipPresenter RuntimeTooltip =>
+            runtimeTooltip;
 
         public void Initialize(
             ViewerNavigationController navigationController,

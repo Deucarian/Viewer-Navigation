@@ -33,9 +33,8 @@ namespace Deucarian.ViewerNavigation.Tests
                 StyleSheet toolbarStyle = Resources.Load<StyleSheet>(
                     ViewerNavigationToolbarPresenter
                         .ToolbarAssetResourcesPath);
-                PanelSettings toolbarPanel = Resources.Load<PanelSettings>(
-                    ViewerNavigationToolbarPresenter
-                        .PanelSettingsResourcesPath);
+                PanelSettings toolbarPanel = DeucarianUIRuntimeAssets
+                    .LoadRuntimePanelSettings();
 
                 Assert.That(presenter, Is.Not.Null);
                 Assert.That(toolbarAsset, Is.Not.Null);
@@ -53,7 +52,10 @@ namespace Deucarian.ViewerNavigation.Tests
                     Is.SameAs(toolbarPanel));
                 Assert.That(
                     presenter.Document.panelSettings.name,
-                    Is.EqualTo("ViewerNavigationToolbarPanelSettings"));
+                    Is.EqualTo("DeucarianRuntimePanelSettings"));
+                Assert.That(
+                    presenter.Document.sortingOrder,
+                    Is.EqualTo(DeucarianUIDepth.PrimaryControls));
                 Assert.That(
                     root.GetComponentsInChildren<UIDocument>(true).Length,
                     Is.EqualTo(1));
@@ -170,8 +172,8 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(
                     styleField.GetValue(visualState),
                     Is.SameAs(compactStyle));
-                VisualElement tooltip = presenter.Root.Q<VisualElement>(
-                    ViewerNavigationRuntimeTooltipPresenter.BubbleName);
+                VisualElement tooltip =
+                    presenter.RuntimeTooltip.Bubble;
                 Assert.That(tooltip, Is.Not.Null);
                 Assert.That(
                     tooltip.style.borderTopLeftRadius.value.value,
@@ -257,10 +259,9 @@ namespace Deucarian.ViewerNavigation.Tests
                 Path.Combine(resourceRoot, "ViewerNavigationToolbar.uxml"));
             string uss = File.ReadAllText(
                 Path.Combine(resourceRoot, "ViewerNavigationToolbar.uss"));
-            string panel = File.ReadAllText(
-                Path.Combine(
-                    resourceRoot,
-                    "ViewerNavigationToolbarPanelSettings.asset"));
+            string duplicatePanel = Path.Combine(
+                resourceRoot,
+                "ViewerNavigationToolbarPanelSettings.asset");
 
             StringAssert.Contains(
                 ViewerNavigationToolbarPresenter.RootName,
@@ -273,11 +274,13 @@ namespace Deucarian.ViewerNavigation.Tests
             StringAssert.Contains("ViewerNavigationRecenter", uss);
             StringAssert.Contains("ViewerNavigationOrthographic", uss);
             StringAssert.Contains("ViewerNavigationPerspective", uss);
-            StringAssert.Contains("m_ReferenceResolution: {x: 1280, y: 720}", panel);
-            StringAssert.Contains("m_ClearColor: 0", panel);
-            StringAssert.DoesNotContain("Report", uxml + uss + panel);
-            StringAssert.DoesNotContain("Simultria", uxml + uss + panel);
-            StringAssert.DoesNotContain("Activity", uxml + uss + panel);
+            Assert.False(File.Exists(duplicatePanel));
+            Assert.That(
+                DeucarianUIRuntimeAssets.LoadRuntimePanelSettings(),
+                Is.Not.Null);
+            StringAssert.DoesNotContain("Report", uxml + uss);
+            StringAssert.DoesNotContain("Simultria", uxml + uss);
+            StringAssert.DoesNotContain("Activity", uxml + uss);
         }
 
         [Test]

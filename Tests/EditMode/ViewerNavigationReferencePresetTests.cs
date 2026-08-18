@@ -456,6 +456,12 @@ namespace Deucarian.ViewerNavigation.Tests
                     BindingFlags.Instance | BindingFlags.NonPublic);
                 Assert.That(field, Is.Not.Null);
                 field.SetValue(settings, true);
+                FieldInfo toolbarField =
+                    typeof(ViewerNavigationSettings).GetField(
+                        "showToolbar",
+                        BindingFlags.Instance | BindingFlags.NonPublic);
+                Assert.That(toolbarField, Is.Not.Null);
+                toolbarField.SetValue(settings, false);
 
                 ViewerNavigationInstaller installer =
                     ViewerNavigationInstaller.Create(
@@ -464,12 +470,21 @@ namespace Deucarian.ViewerNavigation.Tests
                         settings);
 
                 Assert.That(installer.Toolbar, Is.Not.Null);
+                Assert.That(
+                    installer.Toolbar.HasRequiredToolbarControls,
+                    Is.False);
                 Assert.That(installer.Toolbar.ViewCube, Is.Not.Null);
+                Assert.That(
+                    installer.Toolbar.RuntimeTooltip.IsBound(
+                        installer.Toolbar.ViewCube.GetFaceButton(
+                            ViewerViewFace.Front)),
+                    Is.True);
 
                 field.SetValue(settings, false);
                 installer.Toolbar.Initialize(installer.Controller, settings);
 
                 Assert.That(installer.Toolbar.ViewCube, Is.Null);
+                Assert.That(installer.Toolbar.RuntimeTooltip, Is.Null);
             }
             finally
             {

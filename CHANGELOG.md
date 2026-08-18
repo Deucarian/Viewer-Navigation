@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.8 - 2026-08-18
+
+- Replaced the navigation-specific tooltip implementation with the canonical Deucarian UI tooltip layer and adaptive placement policy.
+- Reused the canonical Deucarian runtime PanelSettings and semantic control depth so all viewer UI documents have deterministic ordering.
+
 ## 0.1.7 - 2026-08-17
 
 - Moved the complete canonical reference navigation toolbar into package-owned UXML,
