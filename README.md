@@ -4,17 +4,19 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.8`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.9`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
 toolbar, and an optional six-face view cube. The shared toolbar owns the canonical
-UXML, USS, transparent PanelSettings, icon layout, and interactions for Orbit, Fly,
+UXML, USS, icon layout, and interactions for Orbit, Fly,
 Recenter, and Top view. Its colors, typography, density,
 active/hover/pressed/focus states, runtime tooltips, and provider style overrides are
 resolved through Deucarian UI and Theming. Its panel-shared movement-key guard keeps
 viewer controls out of focused UI without suppressing accessibility or gamepad focus
-navigation. The view cube is disabled by default and can be enabled per
+navigation. Deucarian UI exclusively assigns the canonical PanelSettings and semantic
+`PrimaryControls` surface role; this package never creates a private panel or chooses a
+numeric sorting order. The view cube is disabled by default and can be enabled per
 `ViewerNavigationSettings`. It does not own camera math, raw command routing, model
 loading, browser transport, or application selection behavior.
 

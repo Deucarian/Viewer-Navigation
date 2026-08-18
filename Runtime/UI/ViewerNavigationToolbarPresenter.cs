@@ -37,7 +37,6 @@ namespace Deucarian.ViewerNavigation.UI
             "Perspective view \u00b7 Return to an orbitable 3D view";
 
         [SerializeField] private UIDocument document;
-        [SerializeField] private PanelSettings panelSettings;
 
         private readonly ViewerNavigationToolbarVisualState visualState =
             new ViewerNavigationToolbarVisualState();
@@ -116,7 +115,6 @@ namespace Deucarian.ViewerNavigation.UI
             DisposeUi();
             inputRegistration?.Dispose();
             inputRegistration = null;
-            ReleaseRuntimePanelSettings();
         }
 
         private void Refresh(ViewerNavigationSnapshot snapshot)

@@ -3,6 +3,7 @@ using System.Reflection;
 using Deucarian.Diagnostics;
 using Deucarian.Theming;
 using Deucarian.UI;
+using Deucarian.UI.Editor;
 using Deucarian.ViewerNavigation.UI;
 using NUnit.Framework;
 using UnityEngine;
@@ -56,6 +57,11 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(
                     presenter.Document.sortingOrder,
                     Is.EqualTo(DeucarianUIDepth.PrimaryControls));
+                Assert.That(
+                    DeucarianUIRuntime.IsConfigured(
+                        presenter.Document,
+                        DeucarianUISurfaceRole.PrimaryControls),
+                    Is.True);
                 Assert.That(
                     root.GetComponentsInChildren<UIDocument>(true).Length,
                     Is.EqualTo(1));
@@ -262,6 +268,9 @@ namespace Deucarian.ViewerNavigation.Tests
             string duplicatePanel = Path.Combine(
                 resourceRoot,
                 "ViewerNavigationToolbarPanelSettings.asset");
+            string runtimeRoot = Path.Combine(
+                package.resolvedPath,
+                "Runtime");
 
             StringAssert.Contains(
                 ViewerNavigationToolbarPresenter.RootName,
@@ -281,6 +290,15 @@ namespace Deucarian.ViewerNavigation.Tests
             StringAssert.DoesNotContain("Report", uxml + uss);
             StringAssert.DoesNotContain("Simultria", uxml + uss);
             StringAssert.DoesNotContain("Activity", uxml + uss);
+
+            var violations = DeucarianUILayeringArchitectureValidator
+                .ValidateRuntimeRoot(runtimeRoot);
+            Assert.That(
+                violations,
+                Is.Empty,
+                "Viewer Navigation runtime must delegate screen-space " +
+                "layering to com.deucarian.ui:\n" +
+                string.Join("\n", violations));
         }
 
         [Test]

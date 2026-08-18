@@ -1,5 +1,4 @@
 using System;
-using Deucarian.Common;
 using Deucarian.Theming;
 using Deucarian.Theming.UIToolkit;
 using Deucarian.UI;
@@ -13,7 +12,6 @@ namespace Deucarian.ViewerNavigation.UI
         internal const string ToolbarAssetResourcesPath =
             "Deucarian/ViewerNavigationToolbar";
 
-        private PanelSettings runtimePanelSettings;
         private VisualTreeAsset toolbarAsset;
         private StyleSheet toolbarStyleSheet;
         private VisualElement root;
@@ -39,13 +37,15 @@ namespace Deucarian.ViewerNavigation.UI
         internal bool HasLoadedPresentationAssets =>
             toolbarAsset != null &&
             toolbarStyleSheet != null &&
-            panelSettings != null;
+            DeucarianUIRuntime.CanonicalPanelSettingsAvailable;
 
         internal bool HasAttachedPresentationAssets =>
             HasLoadedPresentationAssets &&
             document != null &&
             document.visualTreeAsset == toolbarAsset &&
-            document.panelSettings == panelSettings &&
+            DeucarianUIRuntime.IsConfigured(
+                document,
+                DeucarianUISurfaceRole.PrimaryControls) &&
             root != null &&
             root.panel != null &&
             document.rootVisualElement.styleSheets.Contains(
@@ -69,11 +69,6 @@ namespace Deucarian.ViewerNavigation.UI
                 ToolbarAssetResourcesPath);
             toolbarStyleSheet = Resources.Load<StyleSheet>(
                 ToolbarAssetResourcesPath);
-            if (panelSettings == null)
-            {
-                panelSettings = DeucarianUIRuntimeAssets
-                    .LoadRuntimePanelSettings();
-            }
 
             if (toolbarAsset == null || toolbarStyleSheet == null)
             {
@@ -95,26 +90,15 @@ namespace Deucarian.ViewerNavigation.UI
                 document = gameObject.AddComponent<UIDocument>();
             }
 
-            if (panelSettings != null)
-            {
-                document.panelSettings = panelSettings;
-            }
-            else if (document.panelSettings == null)
-            {
-                runtimePanelSettings =
-                    ScriptableObject.CreateInstance<PanelSettings>();
-                runtimePanelSettings.name =
-                    "Runtime Deucarian Viewer Navigation Panel Settings";
-                document.panelSettings = runtimePanelSettings;
-            }
+            DeucarianUIRuntime.Configure(
+                document,
+                DeucarianUISurfaceRole.PrimaryControls);
 
             if (toolbarAsset != null)
             {
                 document.visualTreeAsset = toolbarAsset;
             }
 
-            document.sortingOrder =
-                DeucarianUIDepth.PrimaryControls;
         }
 
         private void BuildUi()
@@ -413,15 +397,5 @@ namespace Deucarian.ViewerNavigation.UI
             viewCube = null;
         }
 
-        private void ReleaseRuntimePanelSettings()
-        {
-            if (runtimePanelSettings == null)
-            {
-                return;
-            }
-
-            UnityObjectUtility.DestroySafely(runtimePanelSettings);
-            runtimePanelSettings = null;
-        }
     }
 }

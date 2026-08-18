@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.9 - 2026-08-18
+
+- Delegated navigation-toolbar document configuration and semantic depth to the
+  shared Deucarian UI runtime policy.
+- Removed the navigation package's private PanelSettings field and emergency
+  PanelSettings creation path so every viewer uses the same UI authority.
+
 ## 0.1.8 - 2026-08-18
 
 - Replaced the navigation-specific tooltip implementation with the canonical Deucarian UI tooltip layer and adaptive placement policy.
