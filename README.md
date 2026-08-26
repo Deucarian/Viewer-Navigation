@@ -4,7 +4,7 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.10`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.11`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -31,6 +31,10 @@ ViewerNavigationReferenceCompositionProfile composition =
 ViewerNavigationInstaller navigation =
     composition.Compose(transform, viewerCamera);
 navigation.BeginReferenceLoad();
+ViewerNavigationReferenceCenteringResult centering =
+    ViewerNavigationReferenceCentering.CenterMeshRendererBoundsAtWorldOrigin(
+        loadedModelRoot.transform,
+        includeInactive: true);
 navigation.RegisterReference(loadedModelRoot, frame: true, captureOrigin: true);
 ```
 
@@ -48,6 +52,10 @@ an intentional navigation-settings variation
 while retaining the exact shared input, bounds, animation, and theme objects.
 Reinitializing an installer is supported; it detaches old event subscriptions and
 cancels active camera transitions before applying the replacement dependencies.
+`CenterMeshRendererBoundsAtWorldOrigin` is an explicit placement step for viewers
+that use a world-origin model convention. It includes inactive MeshRenderers without
+activating them and does not register a reference, move the camera, or alter
+selection-owned visibility.
 
 ## Public contract
 
@@ -66,6 +74,8 @@ cancels active camera transitions before applying the replacement dependencies.
   policy.
 - `ViewerNavigationMeshBoundsStrategy` preserves the reference MeshRenderer-only bounds
   policy.
+- `ViewerNavigationReferenceCentering` explicitly centers that same MeshRenderer-only
+  bounds policy at the world origin and returns immutable placement evidence.
 - `ViewerNavigationMovementKeyGuard.Bind(root, movementKeyState)` applies one reference-
   counted movement-key policy to any viewer UI Toolkit document. Its optional state
   delegate bridges the first-frame UI event ordering gap without reading input devices
