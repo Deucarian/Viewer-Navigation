@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.11 - 2026-08-26
+
+- Added an explicit reference-centering operation that moves combined
+  MeshRenderer bounds to the world origin without changing object visibility,
+  navigation state, or the existing reference-registration contract.
+- Shared one MeshRenderer bounds calculator between centering and canonical
+  navigation framing, including inactive renderers by default.
+- Exposed immutable centering evidence for bounds, renderer counts, reference-root
+  positions, applied world offset, and final local placement.
+
 ## 0.1.10 - 2026-08-18
 
 - Added authoritative theme-provider injection to the reference composition so
