@@ -6,7 +6,7 @@ namespace Deucarian.ViewerNavigation.Editor
 {
     public sealed class ViewerNavigationManagerWindow : EditorWindow
     {
-        public const string MenuPath = "Tools/Deucarian/Viewer/Navigation";
+        public const string MenuPath = "Tools/Deucarian/Viewer Navigation";
         private Vector2 scrollPosition;
 
         [MenuItem(MenuPath, priority = 245)]
@@ -42,8 +42,7 @@ namespace Deucarian.ViewerNavigation.Editor
                 DrawSelectedObject();
                 DrawRuntimeState();
                 DeucarianEditorChrome.DrawFooterVersion(
-                    "com.deucarian.viewer-navigation",
-                    "0.1.0");
+                    "com.deucarian.viewer-navigation");
                 EditorGUILayout.EndScrollView();
             }
         }

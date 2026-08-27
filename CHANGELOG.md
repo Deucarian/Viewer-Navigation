@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.12 - 2026-08-26
+
+- Clarified the package display name as the Viewer Navigation Experience while
+  preserving the reusable viewer boundary.
+- Moved the editor workflow to the direct capability menu
+  `Tools/Deucarian/Viewer Navigation`.
+- Updated the exact Camera Navigation, Diagnostics, Editor, Logging, Pointer
+  Capture, and Theming dependencies for the coordinated editor UX release.
+
 ## 0.1.11 - 2026-08-26
 
 - Added an explicit reference-centering operation that moves combined
