@@ -1,6 +1,6 @@
 {
   "packageId": "com.deucarian.viewer-navigation",
-  "displayName": "Deucarian Viewer Navigation",
+  "displayName": "Deucarian Viewer Navigation Experience",
   "samplePolicy": "compiled-example",
   "operationalPackage": true,
   "ownedCapabilities": [

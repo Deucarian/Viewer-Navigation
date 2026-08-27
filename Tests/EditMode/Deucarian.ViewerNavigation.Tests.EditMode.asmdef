@@ -10,6 +10,7 @@
     "Deucarian.UI",
     "Deucarian.UI.Editor",
     "Deucarian.ViewerNavigation",
+    "Deucarian.ViewerNavigation.Editor",
     "UnityEngine.UIElementsModule"
   ],
   "includePlatforms": [
