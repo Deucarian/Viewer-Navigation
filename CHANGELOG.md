@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.13 - 2026-08-31
+
+- Registered the package workflow and a bounded, sanitized local-state card with Deucarian Control Center.
+- Removed normal `Tools/Deucarian` menu exposure while preserving the standalone open API.
+- Updated the shared Editor dependency to 1.2.0.
+- Aligned Camera Navigation 0.2.12, Diagnostics 0.1.6, Logging 1.0.4, Pointer Capture 0.1.4, and Theming 1.1.2.
+
 ## 0.1.12 - 2026-08-26
 
 - Clarified the package display name as the Viewer Navigation Experience while
