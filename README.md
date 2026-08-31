@@ -4,7 +4,7 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.12`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.13`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -122,7 +122,7 @@ It intentionally contains no Report Viewer, Activity Viewer, browser, or backend
 
 ## Editor
 
-Open `Tools > Deucarian > Viewer Navigation` to inspect or install the scene-level
+Open **Deucarian Control Center > Experience > Viewer Navigation** to inspect or install the scene-level
 composition component. The editor surface uses `com.deucarian.editor`.
 
 ## Diagnostics

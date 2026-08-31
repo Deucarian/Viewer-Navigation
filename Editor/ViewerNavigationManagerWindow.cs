@@ -6,10 +6,8 @@ namespace Deucarian.ViewerNavigation.Editor
 {
     public sealed class ViewerNavigationManagerWindow : EditorWindow
     {
-        public const string MenuPath = "Tools/Deucarian/Viewer Navigation";
         private Vector2 scrollPosition;
 
-        [MenuItem(MenuPath, priority = 245)]
         public static void OpenWindow()
         {
             ViewerNavigationManagerWindow window =

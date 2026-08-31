@@ -2,6 +2,7 @@
   "name": "Deucarian.ViewerNavigation.Tests.EditMode",
   "rootNamespace": "Deucarian.ViewerNavigation.Tests",
   "references": [
+    "Deucarian.Editor",
     "Deucarian.CameraNavigation",
     "Deucarian.CameraNavigation.InputSystemIntegration",
     "Deucarian.Diagnostics",
