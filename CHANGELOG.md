@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.14 - 2026-09-02
+
+- Added one transport-neutral navigation-command request and controller adapter so
+  every viewer host mutates the same authoritative Orbit/Fly, top-down, origin,
+  view, and sensitivity state without a product-local command engine.
+- Preserved the established action, view, mode, normalization, and result-message
+  contracts while keeping command routing and wire parsing outside this package.
+- Non-finite sensitivity values now fail before any navigation state changes.
+
 ## 0.1.13 - 2026-08-31
 
 - Registered the package workflow and a bounded, sanitized local-state card with Deucarian Control Center.
