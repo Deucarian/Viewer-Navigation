@@ -4,7 +4,7 @@
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.13`. Unity `2022.3` or newer is supported.
+Current package version: `0.1.14`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -64,6 +64,10 @@ selection-owned visibility.
   policies, including the reference theme family and mode, as one reusable profile.
 - `ViewerNavigationController` is the single authoritative owner of navigation mode,
   top-down state, reference bounds, origin, and active transition state.
+- `ViewerNavigationCommand` and
+  `ViewerNavigationController.TryExecuteCommand(...)` provide the
+  transport-neutral host-command adapter for that same controller. Wire parsing and
+  command routing remain application-owned.
 - `ViewerNavigationSnapshot` is the immutable state notification contract.
 - `IViewerNavigationMotionProfile` supplies application-specific timing and easing.
 - `ViewerNavigationMotionPreferences` provides the shared runtime and WebGL reduced-
