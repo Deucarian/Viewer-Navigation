@@ -11,7 +11,7 @@ namespace Deucarian.ViewerNavigation.Editor
         public static void OpenWindow()
         {
             ViewerNavigationManagerWindow window =
-                GetWindow<ViewerNavigationManagerWindow>("Viewer Navigation");
+                DeucarianEditorWindowPages.GetStandalone<ViewerNavigationManagerWindow>("Viewer Navigation");
             window.minSize = new Vector2(520f, 480f);
             window.Show();
         }
@@ -25,6 +25,9 @@ namespace Deucarian.ViewerNavigation.Editor
         {
             EditorApplication.update -= RepaintWhilePlaying;
         }
+
+        public static IDeucarianEditorPage CreatePage() =>
+            DeucarianEditorImGuiPage.Create<ViewerNavigationManagerWindow>(DeucarianToolIds.ViewerNavigation, window => window.OnGUI());
 
         private void OnGUI()
         {

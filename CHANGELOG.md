@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.15] - 2026-09-09
+
+- Register package tooling and navigation actions as shared Control Center pages. Preserve the domain workflow while using Editor-owned submenus, in-window navigation, and UI scaling.
+
 ## 0.1.14 - 2026-09-02
 
 - Added one transport-neutral navigation-command request and controller adapter so
