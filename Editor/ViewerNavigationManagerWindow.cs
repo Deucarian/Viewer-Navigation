@@ -11,7 +11,7 @@ namespace Deucarian.ViewerNavigation.Editor
         public static void OpenWindow()
         {
             ViewerNavigationManagerWindow window =
-                GetWindow<ViewerNavigationManagerWindow>("Viewer Navigation");
+                DeucarianEditorWindowPages.GetStandalone<ViewerNavigationManagerWindow>("Viewer Navigation");
             window.minSize = new Vector2(520f, 480f);
             window.Show();
         }
@@ -26,20 +26,23 @@ namespace Deucarian.ViewerNavigation.Editor
             EditorApplication.update -= RepaintWhilePlaying;
         }
 
+        public static IDeucarianEditorPage CreatePage() =>
+            DeucarianEditorImGuiPage.Create<ViewerNavigationManagerWindow>(DeucarianToolIds.ViewerNavigation, window => window.OnGUI());
+
         private void OnGUI()
         {
             using (DeucarianEditorWorkbenchPanelScope page =
-                   DeucarianEditorWorkbenchGUI.BeginSettingsPage(
+                   DeucarianEditorWorkbenchGUI.BeginSettingsPage(this,
                        GUILayout.ExpandHeight(true)))
             {
                 scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-                DeucarianEditorChrome.DrawPackageHeader(
+                DeucarianEditorChrome.DrawPackageHeader(this,
                     "Viewer Navigation",
                     "Canonical Orbit, Fly, top-down, origin, and view-cube experience.");
                 DrawOwnership();
                 DrawSelectedObject();
                 DrawRuntimeState();
-                DeucarianEditorChrome.DrawFooterVersion(
+                DeucarianEditorChrome.DrawFooterVersion(this,
                     "com.deucarian.viewer-navigation");
                 EditorGUILayout.EndScrollView();
             }
@@ -49,7 +52,7 @@ namespace Deucarian.ViewerNavigation.Editor
         {
             DeucarianEditorChrome.DrawSectionHeader("Package Boundary");
             DeucarianEditorChrome.BeginSection();
-            EditorGUILayout.HelpBox(
+            DeucarianEditorTextGUI.HelpBox(
                 "This package composes navigation state, transitions, pointer/UI arbitration, " +
                 "toolbar, and view cube. Camera math remains in Camera Navigation; selection, " +
                 "model loading, and browser commands remain application concerns.",
@@ -64,7 +67,7 @@ namespace Deucarian.ViewerNavigation.Editor
             GameObject selected = Selection.activeGameObject;
             if (selected == null)
             {
-                EditorGUILayout.HelpBox(
+                DeucarianEditorTextGUI.HelpBox(
                     "Select the application composition-root GameObject.",
                     MessageType.Info);
             }
@@ -74,10 +77,10 @@ namespace Deucarian.ViewerNavigation.Editor
                     selected.GetComponent<ViewerNavigationInstaller>();
                 if (installer == null)
                 {
-                    EditorGUILayout.HelpBox(
+                    DeucarianEditorTextGUI.HelpBox(
                         selected.name + " has no Viewer Navigation installer.",
                         MessageType.Warning);
-                    if (GUILayout.Button(
+                    if (DeucarianEditorActionGUI.Button(
                             "Add Viewer Navigation Installer",
                             DeucarianEditorWorkbenchGUI.PrimaryButtonStyle))
                     {
@@ -87,12 +90,12 @@ namespace Deucarian.ViewerNavigation.Editor
                 }
                 else
                 {
-                    EditorGUILayout.ObjectField(
+                    DeucarianEditorInputGUI.ObjectField(
                         "Installer",
                         installer,
                         typeof(ViewerNavigationInstaller),
                         true);
-                    if (GUILayout.Button(
+                    if (DeucarianEditorActionGUI.Button(
                             "Select Installer",
                             DeucarianEditorWorkbenchGUI.SecondaryButtonStyle))
                     {
@@ -113,7 +116,7 @@ namespace Deucarian.ViewerNavigation.Editor
                 Object.FindFirstObjectByType<ViewerNavigationController>();
             if (!EditorApplication.isPlaying || controller == null)
             {
-                EditorGUILayout.HelpBox(
+                DeucarianEditorTextGUI.HelpBox(
                     "Enter Play Mode with an initialized controller to inspect live state.",
                     MessageType.Info);
                 DeucarianEditorChrome.EndSection();

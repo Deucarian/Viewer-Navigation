@@ -24,7 +24,7 @@ namespace Deucarian.ViewerNavigation.Editor
                     ViewerNavigationManagerWindow.OpenWindow,
                     PackageId,
                     searchTerms: new[] { "viewer", "navigation", "toolbar", "view cube" },
-                    order: 110));
+                    order: 110, createPage: ViewerNavigationManagerWindow.CreatePage));
 
             CardRegistration = DeucarianControlCenterRegistry.RegisterCardProvider(
                 new ViewerNavigationCardProvider());
@@ -125,7 +125,7 @@ namespace Deucarian.ViewerNavigation.Editor
                         new DeucarianControlCenterAction(
                             PackageId + ".open",
                             "Open Viewer Navigation",
-                            ViewerNavigationManagerWindow.OpenWindow)
+                            ViewerNavigationManagerWindow.OpenWindow, navigationToolId: DeucarianToolIds.ViewerNavigation)
                     },
                     searchTerms: new[]
                     {
