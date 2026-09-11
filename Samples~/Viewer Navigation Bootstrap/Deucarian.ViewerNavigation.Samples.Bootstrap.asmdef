@@ -2,7 +2,9 @@
   "name": "Deucarian.ViewerNavigation.Samples.Bootstrap",
   "rootNamespace": "Deucarian.ViewerNavigation.Samples",
   "references": [
-    "Deucarian.ViewerNavigation"
+    "Deucarian.ViewerNavigation",
+    "Deucarian.CameraNavigation",
+    "Deucarian.CameraNavigation.InputSystemIntegration"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

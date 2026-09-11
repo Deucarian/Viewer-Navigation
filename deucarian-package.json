@@ -30,7 +30,8 @@
     "com.deucarian.theming",
     "com.deucarian.ui",
     "com.unity.modules.uielements",
-    "com.unity.ugui"
+    "com.unity.ugui",
+    "com.unity.render-pipelines.universal"
   ],
   "optionalVersionDefinedDependencies": [],
   "allowedDirectDebugCalls": [],

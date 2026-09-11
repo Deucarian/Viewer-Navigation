@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+- Render the live preview through Camera Navigation's actual Cube scene; wrap and align all preview toolbar actions.
+- Separate the live preview profile from optional scene setup; preserve the draft profile when choosing a target and disable scene application in Play Mode.
+- Use one Cube in the sample and explicitly declare its URP material dependency.
+- Add a wired ViewerNavigationDemo scene, reference model and editable viewer settings.
+- Fix missing camera-navigation assembly references in the importable sample and document Input System requirements.
+
 ## [0.2.0] - 2026-09-11
 
 - Remove the importable metadata beside the Unity-ignored `Samples~` root, preventing spurious missing-folder warnings during asset refresh; keep all sample contents and their import metadata.
