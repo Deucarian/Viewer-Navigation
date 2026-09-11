@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0] - 2026-09-11
+
+- Remove the importable metadata beside the Unity-ignored `Samples~` root, preventing spurious missing-folder warnings during asset refresh; keep all sample contents and their import metadata.
+- Keep preview zoom baselines aligned when user input interrupts transitions, refresh replaced nested profile dependencies live, and honor input-profile pointer/wheel normalization.
+
+- Replace instant illustrative angle/zoom buttons with an isolated interactive preview using the real Viewer Navigation controller and live profile values.
+- Preview Orbit/Fly, smooth wheel zoom, framing/reset, top-down transitions, and optional view-cube actions without Play Mode or global runtime input actions.
+- Keep the navigable scene visible when the view cube is disabled, and release preview input/transitions on page deactivation.
+- Add an explicit manual transition clock; runtime keeps its automatic clock and reduced-motion/instant options.
+- Require Camera Navigation 0.3.0 and shared Editor 1.11.0.
+
 ## [0.1.17] - 2026-09-11
 
 - Use native navigation settings and isolated spatial preview with retained selection, configuration and per-page state.

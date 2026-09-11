@@ -8,6 +8,31 @@ namespace Deucarian.ViewerNavigation.Tests
     public sealed class ViewerNavigationLifecyclePlayModeTests
     {
         [UnityTest]
+        public IEnumerator ManualClockNeverAlsoAdvancesThroughTheRuntimeCoroutine()
+        {
+            var root = new GameObject("Manually driven navigation");
+            var camera = root.AddComponent<Camera>();
+            camera.transform.position = new Vector3(0, 3, -12);
+            var controller = root.AddComponent<ViewerNavigationController>();
+            controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile(1));
+            root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>().enabled = false;
+            controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4), Vector3.zero);
+            controller.SetManualUpdates(true);
+            controller.NavigateToFace(ViewerViewFace.Right);
+            var beforeTick = camera.transform.position;
+            yield return null; yield return null;
+            Assert.AreEqual(beforeTick, camera.transform.position);
+            controller.Tick(.1f); controller.Tick(.1f);
+            var afterTick = camera.transform.position;
+            Assert.Greater(Vector3.Distance(beforeTick, afterTick), .001f);
+            yield return null; yield return null;
+            Assert.AreEqual(afterTick, camera.transform.position);
+            controller.SetManualUpdates(false);
+            Assert.IsFalse(controller.IsTransitioning);
+            Object.Destroy(root);
+        }
+
+        [UnityTest]
         public IEnumerator DefaultMotionPreferenceAnimatesDuringPlayMode()
         {
             yield return null;

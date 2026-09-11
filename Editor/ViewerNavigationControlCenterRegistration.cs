@@ -19,7 +19,7 @@ namespace Deucarian.ViewerNavigation.Editor
                 new DeucarianToolDescriptor(
                     DeucarianToolIds.ViewerNavigation,
                     "Viewer Navigation",
-                    "Inspect and install the package-owned viewer navigation composition.",
+                    "Test viewer controls and tune smooth camera navigation.",
                     DeucarianControlCenterArea.Experience,
                     ViewerNavigationManagerWindow.OpenWindow,
                     PackageId,
