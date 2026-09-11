@@ -1,0 +1,8 @@
+{
+  "name": "Deucarian.ViewerNavigation.Samples.DefinitionWorkflow",
+  "references": [
+    "Deucarian.ViewerNavigation",
+    "Deucarian.CameraNavigation",
+    "Deucarian.CameraNavigation.InputSystemIntegration"
+  ]
+}

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0] - 2026-09-11
+
+- Add typed reusable definition authoring and/or scoped Inspector components that share the existing C# service behavior.
+- Include a playable Definition Workflow sample with configured hosts, short callers and usage documentation.
+- Align declared package dependencies with the definition-authoring development wave.
+
+
 ## [0.2.0] - 2026-09-11
 
 - Remove the importable metadata beside the Unity-ignored `Samples~` root, preventing spurious missing-folder warnings during asset refresh; keep all sample contents and their import metadata.
