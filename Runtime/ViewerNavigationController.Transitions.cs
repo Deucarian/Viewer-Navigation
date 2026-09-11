@@ -9,11 +9,33 @@ namespace Deucarian.ViewerNavigation
     {
         private Coroutine activeTransitionRoutine;
         private uint transitionGeneration;
+        private IEnumerator manualTransition;
+        private float manualDeltaTime;
         private CameraMoveOperation activeMoveOperation;
+        public bool UsesManualUpdates { get; private set; }
+
+        /// <summary>Use an explicit clock instead of a coroutine; changing clock cancels the current move.</summary>
+        public void SetManualUpdates(bool enabled)
+        {
+            if (UsesManualUpdates == enabled) return;
+            UsesManualUpdates = enabled;
+            CancelTransition();
+        }
+
+        public void Tick(float deltaTime)
+        {
+            if (!UsesManualUpdates || manualTransition == null || deltaTime <= 0 ||
+                float.IsNaN(deltaTime) || float.IsInfinity(deltaTime)) return;
+            manualDeltaTime = deltaTime;
+            var routine = manualTransition;
+            if (!routine.MoveNext() && ReferenceEquals(routine, manualTransition)) manualTransition = null;
+        }
 
         public bool CancelTransition()
         {
             transitionGeneration++;
+            (manualTransition as IDisposable)?.Dispose();
+            manualTransition = null;
             if (activeTransitionRoutine != null)
             {
                 StopCoroutine(activeTransitionRoutine);
@@ -84,7 +106,7 @@ namespace Deucarian.ViewerNavigation
             state.BeginTransition(kind);
             if (generation != transitionGeneration) return true;
 
-            if (!Application.isPlaying || duration <= 0f)
+            if ((!Application.isPlaying && !UsesManualUpdates) || duration <= 0f)
             {
                 CommitCameraMove(
                     generation,
@@ -95,8 +117,7 @@ namespace Deucarian.ViewerNavigation
                 return true;
             }
 
-            activeTransitionRoutine = StartCoroutine(
-                AnimateCameraMove(
+            var routine = AnimateCameraMove(
                     generation,
                     startPose,
                     animationStartPose,
@@ -106,7 +127,9 @@ namespace Deucarian.ViewerNavigation
                     pivot,
                     duration,
                     topDownAtEnd,
-                    exitingOrthographic));
+                    exitingOrthographic);
+            if (UsesManualUpdates) manualTransition = routine;
+            else activeTransitionRoutine = StartCoroutine(routine);
             return true;
         }
 
@@ -124,10 +147,12 @@ namespace Deucarian.ViewerNavigation
         {
             if (exitingOrthographic)
             {
-                PreparePerspectiveTransitionStart(
+                ViewerNavigationTransitionPresentation.PreparePerspectiveStart(
+                    navigationCamera,
                     capturedStartPose,
                     animationStartPose,
-                    pivot);
+                    pivot,
+                    motionProfile);
                 state.SetTopDown(false);
                 ApplyNavigationMode();
             }
@@ -153,7 +178,7 @@ namespace Deucarian.ViewerNavigation
                 DeucarianCameraFraming.ConfigureClipPlanes(
                     navigationCamera,
                     bounds);
-                elapsed += Time.unscaledDeltaTime;
+                elapsed += UsesManualUpdates ? manualDeltaTime : Time.unscaledDeltaTime;
                 yield return null;
             }
 
@@ -166,21 +191,6 @@ namespace Deucarian.ViewerNavigation
                     pivot,
                     topDownAtEnd);
             }
-        }
-
-        private void PreparePerspectiveTransitionStart(
-            DeucarianCameraPose orthographicStartPose,
-            DeucarianCameraPose visiblePerspectiveStartPose,
-            Vector3 pivot)
-        {
-            DeucarianCameraPose hiddenPerspectiveMatch =
-                DeucarianCameraFraming
-                    .CreatePerspectiveMatchPoseForOrthographicSwitch(
-                        orthographicStartPose,
-                        pivot,
-                        ViewerNavigationConfigurationResolver.ResolveTransitionMatchFieldOfView(motionProfile));
-            hiddenPerspectiveMatch.ApplyTo(navigationCamera);
-            visiblePerspectiveStartPose.ApplyTo(navigationCamera);
         }
 
         private void CommitCameraMove(
@@ -197,24 +207,13 @@ namespace Deucarian.ViewerNavigation
             if (navigationCamera == null)
             {
                 activeTransitionRoutine = null;
+                manualTransition = null;
                 FinishMoveOperation(CameraMoveResult.InvalidTarget);
                 state.EndTransition();
                 return;
             }
 
-            if (!navigationCamera.orthographic && targetPose.Orthographic)
-            {
-                DeucarianCameraPose hiddenPerspectiveMatch =
-                    DeucarianCameraFraming
-                        .CreatePerspectiveMatchPoseForOrthographicSwitch(
-                            targetPose,
-                            pivot,
-                            ViewerNavigationConfigurationResolver.ResolveTransitionMatchFieldOfView(motionProfile));
-                hiddenPerspectiveMatch.ApplyTo(navigationCamera);
-            }
-
-            targetPose.ApplyTo(navigationCamera);
-            DeucarianCameraFraming.ConfigureClipPlanes(navigationCamera, bounds);
+            ViewerNavigationTransitionPresentation.Commit(navigationCamera, targetPose, bounds, pivot, motionProfile);
             if (navigationRig != null)
             {
                 navigationRig.SetPivot(pivot);
@@ -222,6 +221,7 @@ namespace Deucarian.ViewerNavigation
             }
 
             activeTransitionRoutine = null;
+            manualTransition = null;
             FinishMoveOperation(CameraMoveResult.Completed);
             state.SetTopDown(topDownAtEnd);
             if (generation != transitionGeneration) return;

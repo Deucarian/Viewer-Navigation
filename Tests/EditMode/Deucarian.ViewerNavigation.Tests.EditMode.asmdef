@@ -4,6 +4,7 @@
   "references": [
     "Deucarian.Editor",
     "Deucarian.CameraNavigation",
+    "Deucarian.CameraNavigation.Editor",
     "Deucarian.CameraNavigation.InputSystemIntegration",
     "Deucarian.Diagnostics",
     "Deucarian.PointerCapture",

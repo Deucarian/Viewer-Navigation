@@ -20,21 +20,24 @@ namespace Deucarian.ViewerNavigation.Editor
         private DeucarianEditorWorkspaceForm runtime;
         private bool wasPlaying;
         private Button apply;
-        private System.Action refreshSpecimen;
+        private readonly ViewerNavigationPreview preview;
+        private double previousTime;
         public IDeucarianEditorPage Page { get; }
 
         internal ViewerNavigationPage()
         {
             target = Selection.activeGameObject;
             ReadTarget();
+            preview = new ViewerNavigationPreview(() => settings);
             var root = new VisualElement();
             workspace = new DeucarianEditorWorkspace(root, Application.productName);
             workspace.Title.text = "Viewer navigation";
-            workspace.Subtitle.text = "Give viewers familiar navigation tools.";
+            workspace.Subtitle.text = "Test viewer controls and tune smooth camera navigation.";
             Controls.Show(workspace.Scope, false);
             Controls.Show(workspace.Tabs, false);
             DeucarianEditorWorkspaceNavigation.Populate(workspace, DeucarianToolIds.ViewerNavigation);
-            Page = new DeucarianEditorPage(root, activate: _ => Update(), update: _ => Update(), dispose: Dispose);
+            Page = new DeucarianEditorPage(root, activate: _ => { previousTime = EditorApplication.timeSinceStartup; Update(); },
+                deactivate: preview.Pause, update: _ => Update(), dispose: Dispose);
             Render();
         }
 
@@ -63,28 +66,7 @@ namespace Deucarian.ViewerNavigation.Editor
                 "Configure how viewers navigate the scene.", DeucarianEditorIconIds.Center);
             scroll.Add(card.Root);
             var fields = new VisualElement();
-            var specimen = Controls.Region("viewer-controls-preview", "dw-spatial-specimen");
-            var preview = new DeucarianEditorSpatialPreview(solidCube: true);
-            specimen.Add(preview);
-            float angle = -32, magnification = 1;
-            var toolbar = Controls.Actions(); toolbar.AddToClassList("dw-preview-toolbar"); specimen.Add(toolbar);
-            System.Action updatePreview = () => preview.SetView(Quaternion.Euler(22, angle, 0), magnification);
-            void PreviewButton(string label, string icon, System.Action action)
-            {
-                var button = Controls.IconButton(string.Empty, icon, action); button.tooltip = label; toolbar.Add(button);
-            }
-            PreviewButton("Rotate preview", DeucarianEditorIconIds.Orbit, () => { angle += 30; updatePreview(); });
-            PreviewButton("Zoom preview", DeucarianEditorIconIds.Search, () => { magnification = magnification >= 1.4f ? .8f : magnification + .2f; updatePreview(); });
-            PreviewButton("Frame preview", DeucarianEditorIconIds.Fit, () => { magnification = 1; updatePreview(); });
-            PreviewButton("Reset preview", DeucarianEditorIconIds.Home, () => { angle = -32; magnification = 1; updatePreview(); });
-            var hiddenCube = Controls.Label("View cube is off", "dw-empty"); specimen.Add(hiddenCube);
-            refreshSpecimen = () =>
-            {
-                bool cubeVisible = settings == null || settings.ShowViewCube;
-                Controls.Show(preview, cubeVisible); Controls.Show(hiddenCube, !cubeVisible);
-                Controls.Show(toolbar, settings == null || settings.ShowToolbar);
-            };
-            var split = Controls.Split(fields, specimen); split.AddToClassList("dw-spatial-split"); card.Details.Add(split);
+            var split = Controls.Split(fields, preview.Root); split.AddToClassList("dw-spatial-split"); card.Details.Add(split);
             var targetField = new ObjectField { name = "viewer-target", objectType = typeof(GameObject), allowSceneObjects = true, value = target };
             targetField.RegisterValueChangedCallback(evt => { target = evt.newValue as GameObject; ReadTarget(); Render(); });
             fields.Add(Controls.Field("Scene object", targetField));
@@ -116,7 +98,10 @@ namespace Deucarian.ViewerNavigation.Editor
             apply.tooltip = "Assign these references with Undo. Existing runtime navigation is not rebuilt.";
             card.Actions.Add(apply);
             card.Actions.Add(select);
+            card.Details.Add(Controls.Label("Drag to look or orbit · Shift-drag to pan · Scroll to zoom · Click, then WASD + Q/E to move", "dw-muted"));
+            workspace.FooterLeading.text = "Interactive preview · Your scene cameras stay unchanged";
             BuildRuntime(scroll);
+            previousTime = EditorApplication.timeSinceStartup;
             Update();
         }
 
@@ -177,13 +162,15 @@ namespace Deucarian.ViewerNavigation.Editor
             if (wasPlaying != EditorApplication.isPlaying) { Render(); return; }
             if (EditorApplication.isPlaying && installer != null) liveController = installer.Controller;
             runtime?.Refresh();
-            refreshSpecimen?.Invoke();
+            double now = EditorApplication.timeSinceStartup;
+            preview.Update((float)(now - previousTime));
+            previousTime = now;
             apply?.SetEnabled(target != null && !EditorUtility.IsPersistent(target) && settings != null && camera != null);
         }
 
         private DeucarianEditorSerializedForm Bind(VisualElement root, Object value)
         { var binding = new DeucarianEditorSerializedForm(root, value); bindings.Add(binding); return binding; }
         private void ClearBindings() { foreach (var binding in bindings) binding.Dispose(); bindings.Clear(); }
-        private void Dispose() { ClearBindings(); workspace.Dispose(); }
+        private void Dispose() { ClearBindings(); preview.Dispose(); workspace.Dispose(); }
     }
 }

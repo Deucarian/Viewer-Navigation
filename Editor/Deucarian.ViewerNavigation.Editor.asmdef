@@ -3,6 +3,9 @@
   "rootNamespace": "Deucarian.ViewerNavigation.Editor",
   "references": [
     "Deucarian.Editor",
+    "Deucarian.CameraNavigation",
+    "Deucarian.CameraNavigation.Editor",
+    "Deucarian.CameraNavigation.InputSystemIntegration",
     "Deucarian.ViewerNavigation"
   ],
   "includePlatforms": [
