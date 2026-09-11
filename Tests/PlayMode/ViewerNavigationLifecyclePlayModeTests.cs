@@ -8,6 +8,30 @@ namespace Deucarian.ViewerNavigation.Tests
     public sealed class ViewerNavigationLifecyclePlayModeTests
     {
         [UnityTest]
+        public IEnumerator AwaitedReturnCompletesOnDisableAndRejectsMovesWhileDisabled()
+        {
+            var root = new GameObject("awaited navigation");
+            var cameraObject = new GameObject("camera");
+            try
+            {
+                var camera = cameraObject.AddComponent<Camera>();
+                var controller = root.AddComponent<ViewerNavigationController>();
+                controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile(1f));
+                controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4f), Vector3.zero);
+                controller.CaptureOrigin();
+                camera.transform.position = Vector3.one * 10;
+                var task = controller.ReturnToOriginAsync();
+                Assert.That(task.IsCompleted, Is.False);
+                controller.enabled = false;
+                for (int i = 0; i < 30 && !task.IsCompleted; i++) yield return null;
+                Assert.That(task.IsCompleted, Is.True);
+                Assert.That(task.Result, Is.EqualTo(Deucarian.CameraNavigation.CameraMoveResult.Cancelled));
+                Assert.That(controller.ReturnToOriginAsync().Result, Is.EqualTo(Deucarian.CameraNavigation.CameraMoveResult.InvalidTarget));
+            }
+            finally { Object.DestroyImmediate(root); Object.DestroyImmediate(cameraObject); }
+        }
+
+        [UnityTest]
         public IEnumerator DefaultMotionPreferenceAnimatesDuringPlayMode()
         {
             yield return null;

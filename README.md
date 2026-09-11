@@ -156,3 +156,7 @@ requests and pushes to `develop` and `main`.
 ## License
 
 Released under the MIT License. See `LICENSE.md`.
+
+## Simple typed usage
+
+See [Simple usage](Documentation~/SimpleUsage.md) for the short caller, Inspector selections and one-time scoped setup.
