@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.17] - 2026-09-11
+
+- Use native navigation settings and isolated spatial preview with retained selection, configuration and per-page state.
+- Require Editor 1.10.6 for the shared native controls, typography, responsive layouts and accessible interaction states.
+
 ## [0.1.16] - 2026-09-09
 
 ### Changed
