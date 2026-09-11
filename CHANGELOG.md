@@ -4,6 +4,7 @@
 
 - Remove the importable metadata beside the Unity-ignored `Samples~` root, preventing spurious missing-folder warnings during asset refresh; keep all sample contents and their import metadata.
 - Keep preview zoom baselines aligned when user input interrupts transitions, refresh replaced nested profile dependencies live, and honor input-profile pointer/wheel normalization.
+- Preserve awaitable return operations and typed navigation access alongside manual preview driving, sharing the existing pose/configuration adapters.
 
 - Replace instant illustrative angle/zoom buttons with an isolated interactive preview using the real Viewer Navigation controller and live profile values.
 - Preview Orbit/Fly, smooth wheel zoom, framing/reset, top-down transitions, and optional view-cube actions without Play Mode or global runtime input actions.

@@ -1,0 +1,17 @@
+{
+  "name": "Deucarian.ViewerNavigation.Samples.SimpleUsage",
+  "rootNamespace": "Deucarian.ViewerNavigation.Samples.SimpleUsage",
+  "references": [
+    "Deucarian.ViewerNavigation",
+    "Deucarian.CameraNavigation"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

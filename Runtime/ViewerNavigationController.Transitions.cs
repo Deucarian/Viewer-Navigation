@@ -11,14 +11,15 @@ namespace Deucarian.ViewerNavigation
         private uint transitionGeneration;
         private IEnumerator manualTransition;
         private float manualDeltaTime;
+        private CameraMoveOperation activeMoveOperation;
         public bool UsesManualUpdates { get; private set; }
 
         /// <summary>Use an explicit clock instead of a coroutine; changing clock cancels the current move.</summary>
         public void SetManualUpdates(bool enabled)
         {
             if (UsesManualUpdates == enabled) return;
-            CancelTransition();
             UsesManualUpdates = enabled;
+            CancelTransition();
         }
 
         public void Tick(float deltaTime)
@@ -41,6 +42,7 @@ namespace Deucarian.ViewerNavigation
                 activeTransitionRoutine = null;
             }
 
+            FinishMoveOperation(CameraMoveResult.Cancelled);
             bool canceled = state.EndTransition();
             if (canceled)
             {
@@ -59,14 +61,21 @@ namespace Deucarian.ViewerNavigation
             Vector3 pivot,
             ViewerNavigationTransitionKind kind,
             bool animate,
-            bool topDownAtEnd)
+            bool topDownAtEnd,
+            CameraMoveOperation operation = null)
         {
-            if (navigationCamera == null || !IsFinite(targetPose.Position))
+            if (navigationCamera == null || !isActiveAndEnabled || !IsFinite(targetPose.Position))
             {
                 return false;
             }
 
+            uint expectedAfterCancel = transitionGeneration + 1;
             CancelTransition();
+            if (transitionGeneration != expectedAfterCancel)
+            {
+                operation?.Complete(CameraMoveResult.Cancelled);
+                return false;
+            }
             DeucarianCameraPose startPose =
                 DeucarianCameraPose.Capture(navigationCamera);
             bool enteringOrthographic =
@@ -93,7 +102,9 @@ namespace Deucarian.ViewerNavigation
                 ? motionProfile.CalculateTransitionDuration(distance)
                 : 0f;
             uint generation = ++transitionGeneration;
+            activeMoveOperation = operation;
             state.BeginTransition(kind);
+            if (generation != transitionGeneration) return true;
 
             if ((!Application.isPlaying && !UsesManualUpdates) || duration <= 0f)
             {
@@ -158,7 +169,7 @@ namespace Deucarian.ViewerNavigation
                 float rotation = motionProfile != null
                     ? motionProfile.EvaluateRotation(normalized)
                     : normalized;
-                ViewerNavigationTransitionPresentation.ApplyFrame(
+                ViewerNavigationTransitionPose.Apply(
                     navigationCamera,
                     animationStartPose,
                     animationTargetPose,
@@ -189,8 +200,16 @@ namespace Deucarian.ViewerNavigation
             Vector3 pivot,
             bool topDownAtEnd)
         {
-            if (generation != transitionGeneration || navigationCamera == null)
+            if (generation != transitionGeneration)
             {
+                return;
+            }
+            if (navigationCamera == null)
+            {
+                activeTransitionRoutine = null;
+                manualTransition = null;
+                FinishMoveOperation(CameraMoveResult.InvalidTarget);
+                state.EndTransition();
                 return;
             }
 
@@ -201,10 +220,20 @@ namespace Deucarian.ViewerNavigation
                 navigationRig.SyncNavigationState();
             }
 
-            state.SetTopDown(topDownAtEnd);
             activeTransitionRoutine = null;
+            manualTransition = null;
+            FinishMoveOperation(CameraMoveResult.Completed);
+            state.SetTopDown(topDownAtEnd);
+            if (generation != transitionGeneration) return;
             state.EndTransition();
             ApplyNavigationMode();
+        }
+
+        private void FinishMoveOperation(CameraMoveResult result)
+        {
+            var operation = activeMoveOperation;
+            activeMoveOperation = null;
+            operation?.Complete(result);
         }
 
     }
