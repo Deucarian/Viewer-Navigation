@@ -23,6 +23,8 @@ Deucarian Editor.
 
 ## Policies
 
+- URP is declared for the packaged example material. Navigation behavior remains pipeline-agnostic; the editor preview delegates rendering to Camera Navigation. Input backend configuration belongs to Input System Integration, not the viewer controller.
+
 - Preserve one authoritative state owner and event-driven presentation updates.
 - Keep reference registration separate from visibility or selection updates.
 - Never move the camera as a side effect of a model visibility change.

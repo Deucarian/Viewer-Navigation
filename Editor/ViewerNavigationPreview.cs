@@ -59,7 +59,8 @@ namespace Deucarian.ViewerNavigation.Editor
             cube.FaceSelected += face => Run(() => controller.NavigateToFace(face));
             Root.Add(cube);
             toolbar = Controls.Actions();
-            toolbar.AddToClassList("dw-preview-toolbar");
+            toolbar.name = "viewer-preview-toolbar";
+            toolbar.AddToClassList("dw-scene-preview-toolbar");
             Root.Add(toolbar);
             orbit = Button("Orbit", DeucarianEditorIconIds.Orbit, () => SetMode(ViewerNavigationMode.Orbit));
             fly = Button("Fly", DeucarianEditorIconIds.Send, () => SetMode(ViewerNavigationMode.Fly));
@@ -67,6 +68,7 @@ namespace Deucarian.ViewerNavigation.Editor
             Button("Frame", DeucarianEditorIconIds.Fit, () => Run(() => controller.FrameReference()));
             Button("Reset", DeucarianEditorIconIds.Home, () => Run(() => controller.ReturnToOrigin()));
             RefreshPresentation();
+            Root.RegisterCallback<GeometryChangedEvent>(_ => cameraPreview.RefreshView(true));
         }
 
         private ViewerNavigationSettings ResolveSettings() => readSettings() ?? referenceSettings;
