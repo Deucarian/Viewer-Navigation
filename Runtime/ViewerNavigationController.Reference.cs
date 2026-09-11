@@ -124,7 +124,14 @@ namespace Deucarian.ViewerNavigation
                 false);
         }
 
-        public bool ReturnToOrigin(bool animate = true)
+        public bool ReturnToOrigin(bool animate = true) => ReturnToOrigin(animate, null);
+
+        public System.Threading.Tasks.Task<CameraMoveResult> ReturnToOriginAsync(bool animate = true,
+            System.Threading.CancellationToken cancellationToken = default) =>
+            CameraMoveOperation.Run(operation => ReturnToOrigin(animate, operation),
+                operation => { if (this != null && ReferenceEquals(activeMoveOperation, operation)) CancelTransition(); }, cancellationToken);
+
+        private bool ReturnToOrigin(bool animate, CameraMoveOperation operation)
         {
             if (navigationCamera == null)
             {
@@ -142,7 +149,8 @@ namespace Deucarian.ViewerNavigation
                 HasReferenceBounds ? referenceBounds.center : Vector3.zero,
                 ViewerNavigationTransitionKind.ReturnToOrigin,
                 animate,
-                false);
+                false,
+                operation);
         }
 
         public bool SetTopDown(bool enabled, bool animate = true)
