@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.0] - 2026-09-12
+
+- Accept injected Pointer Capture sessions; remove the navigation-owned capture adapter and keep legacy composition at the Pointer Capture boundary.
+
 ## Asset workflow — Unreleased
 
 - Show the bundled reference profile as the effective preview default and retain profile/scene/camera pickers across preview updates.

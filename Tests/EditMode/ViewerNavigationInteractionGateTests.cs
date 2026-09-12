@@ -1,14 +1,35 @@
 using System;
+using System.Collections;
 using Deucarian.CameraNavigation.InputSystemIntegration;
 using Deucarian.PointerCapture;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
 namespace Deucarian.ViewerNavigation.Tests
 {
     public sealed class ViewerNavigationInteractionGateTests
     {
+        [UnityTest]
+        public IEnumerator InjectedCaptureOwnsNoSceneComponentAndTeardownEndsOnlyTheBorrowedSession()
+        {
+            yield return new EnterPlayMode();
+            var root = new GameObject("Borrowed capture");
+            var session = new TestPointerCaptureSession();
+            try
+            {
+                var gate = root.AddComponent<ViewerNavigationInteractionGate>();
+                gate.ConfigureCapture(session);
+                Assert.That(root.GetComponent<DeucarianPointerCaptureController>(), Is.Null);
+                Assert.That(gate.CaptureSession, Is.SameAs(session));
+                Assert.That(session.Disposed, Is.False);
+            }
+            finally { Object.DestroyImmediate(root); }
+            Assert.That(session.Disposed, Is.True);
+            yield return new ExitPlayMode();
+        }
+
         [Test]
         public void ConfiguredActionStartsNavigationWhenRelevantInputIsAllowed()
         {
@@ -419,12 +440,15 @@ namespace Deucarian.ViewerNavigation.Tests
     }
 
     internal sealed class TestPointerCaptureSession :
-        IViewerPointerCaptureSession
+        IPointerCaptureSession
     {
         public event EventHandler<DeucarianPointerCaptureStateChangedEventArgs>
             StateChanged;
 
         internal bool RequestSucceeds { get; set; }
+        internal bool Disposed { get; private set; }
+        public void Dispose() { Disposed = true; }
+        public DeucarianPointerCaptureDiagnosticsSnapshot GetDiagnosticsSnapshot() => default;
         internal int RequestCount { get; private set; }
         internal int ReleaseCount { get; private set; }
         public DeucarianPointerCaptureState State { get; private set; } =

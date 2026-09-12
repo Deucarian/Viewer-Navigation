@@ -18,7 +18,14 @@ components for scene callers.
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.3.0`. Unity `2022.3` or newer is supported.
+Current package version: `0.4.0`. Unity `2022.3` or newer is supported.
+
+For multi-scene applications, create one `PointerCaptureScope` in application
+startup and call `viewer.ConfigurePointerCapture(scope.OpenSession())` before
+`Initialize`. Navigation disposes only its borrowed session on destruction; the
+application disposes the scope on shutdown. Existing callers remain supported
+through Pointer Capture's documented scene-scoped compatibility adapter. The
+Definition Workflow sample demonstrates the explicit composition route.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation

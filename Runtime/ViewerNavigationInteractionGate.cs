@@ -10,14 +10,12 @@ namespace Deucarian.ViewerNavigation
 {
     [DefaultExecutionOrder(-1000)]
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(DeucarianPointerCaptureController))]
     public sealed class ViewerNavigationInteractionGate :
         MonoBehaviour,
         IDeucarianNavigationInputBlocker
     {
         private readonly List<VisualElement> uiRoots = new List<VisualElement>();
-        private DeucarianPointerCaptureController pointerCapture;
-        private IViewerPointerCaptureSession pointerCaptureSession;
+        private IPointerCaptureSession pointerCaptureSession;
         private IViewerNavigationInputBlocker externalBlocker;
         private IDeucarianNavigationActionStateSource actionStateSource;
         private ViewerNavigationMode mode;
@@ -30,8 +28,21 @@ namespace Deucarian.ViewerNavigation
 
         public event Action NavigationInputStarted;
 
-        public DeucarianPointerCaptureController PointerCapture =>
-            ResolvePointerCapture();
+        [Obsolete("Use CaptureSession. Capture components are owned by Pointer Capture, not navigation.")]
+        public DeucarianPointerCaptureController PointerCapture => GetComponent<DeucarianPointerCaptureController>();
+        public IPointerCaptureSession CaptureSession => pointerCaptureSession;
+
+        public void ConfigureCapture(IPointerCaptureSession session)
+        {
+            if (session == null) throw new ArgumentNullException(nameof(session));
+            if (ReferenceEquals(session, pointerCaptureSession)) return;
+            ReleaseCapture();
+            UnsubscribeCaptureSession();
+            pointerCaptureSession?.Dispose();
+            pointerCaptureSession = session;
+            captureDeniedUntilRelease = false;
+            SubscribeCaptureSession();
+        }
 
         public void Configure(IViewerNavigationInputBlocker blocker)
         {
@@ -168,12 +179,10 @@ namespace Deucarian.ViewerNavigation
 
         private void Awake()
         {
-            ResolvePointerCapture();
         }
 
         private void OnEnable()
         {
-            ResolvePointerCapture();
             SubscribeCaptureSession();
         }
 
@@ -248,27 +257,17 @@ namespace Deucarian.ViewerNavigation
         private void OnDestroy()
         {
             UnsubscribeCaptureSession();
+            pointerCaptureSession?.Dispose();
+            pointerCaptureSession = null;
         }
 
-        private DeucarianPointerCaptureController ResolvePointerCapture()
+        private void ResolvePointerCapture()
         {
-            if (pointerCapture == null)
-            {
-                pointerCapture = GetComponent<DeucarianPointerCaptureController>();
-                if (pointerCapture == null)
-                {
-                    pointerCapture = gameObject.AddComponent<DeucarianPointerCaptureController>();
-                }
-            }
-
             if (pointerCaptureSession == null)
             {
-                pointerCaptureSession =
-                    new ViewerPointerCaptureSession(pointerCapture);
+                pointerCaptureSession = PointerCaptureCompatibility.OpenSceneSession(this);
                 SubscribeCaptureSession();
             }
-
-            return pointerCapture;
         }
 
         private bool HasAllowedNavigationAction(
@@ -302,7 +301,7 @@ namespace Deucarian.ViewerNavigation
         }
 
         internal void SetPointerCaptureSessionForTesting(
-            IViewerPointerCaptureSession session)
+            IPointerCaptureSession session)
         {
             if (session == null)
             {
