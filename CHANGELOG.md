@@ -1,5 +1,9 @@
 # Changelog
 
+## Asset workflow — Unreleased
+
+- Show the bundled reference profile as the effective preview default and retain profile/scene/camera pickers across preview updates.
+
 ## [0.3.0] - Unreleased
 
 - Add typed reusable definition authoring and/or scoped Inspector components that share the existing C# service behavior.

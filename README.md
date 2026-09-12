@@ -1,5 +1,9 @@
 # Deucarian Viewer Navigation Experience
 
+## Asset selection and project defaults
+
+The preview profile starts with the bundled reference preset until you select another profile. Choose includes project and package assets; Create/Customize makes an editable project copy. Scene object and Camera remain explicit scene selections rather than guessing objects. Profile changes update the preview; applying a setup to scene objects remains a separate action.
+
 ## Typed definition workflow
 
 Mode selection is an enum shared by C# and the Inspector. The existing viewer controller remains the only navigation state owner.
