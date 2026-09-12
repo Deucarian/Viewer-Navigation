@@ -1,4 +1,5 @@
 using UnityEngine;
+using Deucarian.PointerCapture;
 namespace Deucarian.ViewerNavigation.Samples.DefinitionWorkflow
 {
     [DefaultExecutionOrder(-2000)]
@@ -6,6 +7,13 @@ namespace Deucarian.ViewerNavigation.Samples.DefinitionWorkflow
     {
         [SerializeField] private ViewerNavigationController controller;
         [SerializeField] private Camera cameraToControl;
-        private void Awake() => controller.Initialize(cameraToControl, (ViewerNavigationSettings)null);
+        private PointerCaptureScope capture;
+        private void Awake()
+        {
+            capture = new PointerCaptureScope();
+            controller.ConfigurePointerCapture(capture.OpenSession());
+            controller.Initialize(cameraToControl, (ViewerNavigationSettings)null);
+        }
+        private void OnDestroy() => capture?.Dispose();
     }
 }
