@@ -31,7 +31,8 @@
     "com.deucarian.theming": "1.8.0",
     "com.deucarian.ui": "0.2.7",
     "com.unity.ugui": "1.0.0",
-    "com.unity.modules.uielements": "1.0.0"
+    "com.unity.modules.uielements": "1.0.0",
+    "com.unity.render-pipelines.universal": "14.0.12"
   },
   "samples": [
     {

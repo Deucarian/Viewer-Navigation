@@ -198,3 +198,11 @@ Released under the MIT License. See `LICENSE.md`.
 ## Simple typed usage
 
 See [Simple usage](Documentation~/SimpleUsage.md) for the short caller, Inspector selections and one-time scoped setup.
+
+## Preview versus scene setup
+
+The editor preview renders a real Unity Cube. `Preview profile` changes its live controls and motion values. The wrapping toolbar and view cube operate only on that isolated preview.
+
+`Apply to a scene` is separate: assign an Installer object, Scene camera and your profile, then apply with Undo. Choosing a scene object does not replace the preview profile. Scene application is disabled in Play Mode.
+
+The importable `ViewerNavigationDemo.unity` scene uses one Cube and the runtime toolbar. Its material requires URP (declared by this package); assign a URP asset in Graphics Settings and check Quality overrides. The Input System integration keeps Active Input Handling set to Both, with a one-time editor restart needed if native input was disabled.
