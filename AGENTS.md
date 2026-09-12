@@ -2,6 +2,8 @@
 
 Package ID: `com.deucarian.viewer-navigation`
 
+Follow the canonical [Deucarian architecture](https://github.com/Deucarian/Package-Registry/blob/main/ARCHITECTURE.md).
+
 ## Ownership
 
 This package owns the reusable viewer navigation experience: authoritative Orbit/Fly

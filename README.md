@@ -1,10 +1,20 @@
 # Deucarian Viewer Navigation Experience
 
+## Typed definition workflow
+
+Mode selection is an enum shared by C# and the Inspector. The existing viewer controller remains the only navigation state owner.
+
+Start with the [Definition Workflow walkthrough](Documentation~/DefinitionWorkflow.md).
+Import **Definition Workflow** in Package Manager for a configured sample scene
+and short caller scripts. The sample keeps typed contracts and service setup explicit, with reusable
+components for scene callers.
+
+
 `com.deucarian.viewer-navigation` composes the existing Deucarian camera, Input System,
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.2.0`. Unity `2022.3` or newer is supported.
+Current package version: `0.3.0`. Unity `2022.3` or newer is supported.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation

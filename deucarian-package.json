@@ -13,7 +13,8 @@
     "Deucarian.ViewerNavigation.Editor"
   ],
   "sampleAssemblies": [
-    "Deucarian.ViewerNavigation.Samples.Bootstrap"
+    "Deucarian.ViewerNavigation.Samples.Bootstrap",
+    "Deucarian.ViewerNavigation.Samples.DefinitionWorkflow"
   ],
   "testAssemblies": [
     "Deucarian.ViewerNavigation.Tests.EditMode",

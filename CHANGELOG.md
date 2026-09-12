@@ -1,12 +1,17 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - Unreleased
+
+- Add typed reusable definition authoring and/or scoped Inspector components that share the existing C# service behavior.
+- Include a playable Definition Workflow sample with configured hosts, short callers and usage documentation.
+- Align declared package dependencies with the definition-authoring development wave.
 
 - Render the live preview through Camera Navigation's actual Cube scene; wrap and align all preview toolbar actions.
 - Separate the live preview profile from optional scene setup; preserve the draft profile when choosing a target and disable scene application in Play Mode.
 - Use one Cube in the sample and explicitly declare its URP material dependency.
 - Add a wired ViewerNavigationDemo scene, reference model and editable viewer settings.
 - Fix missing camera-navigation assembly references in the importable sample and document Input System requirements.
+
 
 ## [0.2.0] - 2026-09-11
 
