@@ -22,6 +22,7 @@ namespace Deucarian.ViewerNavigation.Editor
         private bool sceneSetupExpanded;
         private Button apply;
         private readonly ViewerNavigationPreview preview;
+        private readonly DeucarianEditorAssetField profilePicker, targetPicker, cameraPicker;
         private double previousTime;
         public IDeucarianEditorPage Page { get; }
 
@@ -29,7 +30,16 @@ namespace Deucarian.ViewerNavigation.Editor
         {
             target = Selection.activeGameObject;
             ReadTarget(true);
+            settings = settings != null ? settings : ViewerNavigationSettings.LoadReferencePreset();
             preview = new ViewerNavigationPreview(() => settings);
+            profilePicker = new DeucarianEditorAssetField("viewer-profile", typeof(ViewerNavigationSettings), () => settings,
+                value => { settings = value as ViewerNavigationSettings; Render(); },
+                create: () => { CreateProfile(); return settings; }, customize: DeucarianEditorAssetCatalog.CopyToProject,
+                defaultValue: ViewerNavigationSettings.LoadReferencePreset);
+            targetPicker = new DeucarianEditorAssetField("viewer-target", typeof(GameObject), () => target,
+                value => { target = value as GameObject; ReadTarget(); Render(); }, allowSceneObjects: true);
+            cameraPicker = new DeucarianEditorAssetField("viewer-camera", typeof(Camera), () => camera,
+                value => camera = value as Camera, allowSceneObjects: true);
             var root = new VisualElement();
             workspace = new DeucarianEditorWorkspace(root, Application.productName);
             workspace.Title.text = "Viewer navigation";
@@ -68,9 +78,7 @@ namespace Deucarian.ViewerNavigation.Editor
             scroll.Add(card.Root);
             var fields = new VisualElement();
             var split = Controls.Split(fields, preview.Root); split.AddToClassList("dw-spatial-split"); card.Details.Add(split);
-            var profileField = new ObjectField { name = "viewer-profile", objectType = typeof(ViewerNavigationSettings), value = settings, allowSceneObjects = false };
-            profileField.RegisterValueChangedCallback(evt => { settings = evt.newValue as ViewerNavigationSettings; Render(); });
-            fields.Add(Controls.Field("Preview profile", profileField));
+            fields.Add(Controls.Field("Preview profile", profilePicker.Root)); profilePicker.Refresh();
             fields.Add(Controls.Divider());
             if (settings == null)
             {
@@ -105,12 +113,8 @@ namespace Deucarian.ViewerNavigation.Editor
             setup.AddToClassList("dw-foldout");
             parent.Add(setup);
             setup.Add(Controls.Label("Optional scene setup. These references do not change the isolated preview above.", "dw-muted"));
-            var targetField = new ObjectField { name = "viewer-target", objectType = typeof(GameObject), allowSceneObjects = true, value = target };
-            targetField.RegisterValueChangedCallback(evt => { target = evt.newValue as GameObject; ReadTarget(); Render(); });
-            setup.Add(Controls.Field("Installer object", targetField));
-            var cameraField = new ObjectField { name = "viewer-camera", objectType = typeof(Camera), allowSceneObjects = true, value = camera };
-            cameraField.RegisterValueChangedCallback(evt => camera = evt.newValue as Camera);
-            setup.Add(Controls.Field("Scene camera", cameraField));
+            setup.Add(Controls.Field("Installer object", targetPicker.Root)); targetPicker.Refresh();
+            setup.Add(Controls.Field("Scene camera", cameraPicker.Root)); cameraPicker.Refresh();
             apply = Controls.Button(installer == null ? "Add navigation to object" : "Apply profile to scene", Apply, true);
             apply.name = "viewer-apply-scene";
             apply.tooltip = "Assign the preview profile and camera with Undo. Does not change the preview camera.";
