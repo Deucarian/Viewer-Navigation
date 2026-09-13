@@ -62,9 +62,9 @@ namespace Deucarian.ViewerNavigation
 
         public bool SetReferenceBounds(Bounds bounds, Vector3 pivot)
         {
-            if (!IsFinite(bounds.center) ||
-                !IsFinite(bounds.size) ||
-                !IsFinite(pivot) ||
+            if (!ViewerNavigationPoseValidation.IsFinite(bounds.center) ||
+                !ViewerNavigationPoseValidation.IsFinite(bounds.size) ||
+                !ViewerNavigationPoseValidation.IsFinite(pivot) ||
                 bounds.size.sqrMagnitude <= 0.00000001f)
             {
                 return false;
@@ -219,7 +219,7 @@ namespace Deucarian.ViewerNavigation
             bool animate = true)
         {
             if (navigationCamera == null ||
-                !IsFinite(directionFromTargetToCamera) ||
+                !ViewerNavigationPoseValidation.IsFinite(directionFromTargetToCamera) ||
                 directionFromTargetToCamera.sqrMagnitude <= 0.0001f)
             {
                 return false;
@@ -227,7 +227,7 @@ namespace Deucarian.ViewerNavigation
 
             Bounds bounds = ResolveNavigationBounds();
             Vector3 pivot = Pivot;
-            Bounds framingBounds = CreatePivotCenteredBounds(bounds, pivot);
+            Bounds framingBounds = ViewerViewFacePolicy.CreatePivotCenteredBounds(bounds, pivot);
             DeucarianCameraPose pose = DeucarianCameraFraming.CreateViewDirectionPose(
                 framingBounds,
                 navigationCamera,
@@ -240,16 +240,6 @@ namespace Deucarian.ViewerNavigation
                 ViewerNavigationTransitionKind.ViewFace,
                 animate,
                 false);
-        }
-
-        private static Bounds CreatePivotCenteredBounds(Bounds bounds, Vector3 pivot)
-        {
-            Vector3 centerOffset = bounds.center - pivot;
-            Vector3 extents = bounds.extents + new Vector3(
-                Mathf.Abs(centerOffset.x),
-                Mathf.Abs(centerOffset.y),
-                Mathf.Abs(centerOffset.z));
-            return new Bounds(pivot, extents * 2f);
         }
 
         public bool TryFrame(
@@ -310,11 +300,5 @@ namespace Deucarian.ViewerNavigation
             }
         }
 
-        private static bool IsFinite(Vector3 value)
-        {
-            return !float.IsNaN(value.x) && !float.IsInfinity(value.x) &&
-                   !float.IsNaN(value.y) && !float.IsInfinity(value.y) &&
-                   !float.IsNaN(value.z) && !float.IsInfinity(value.z);
-        }
     }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.1] - 2026-09-13
+
+- Restore authored camera poses through the existing cancellable navigation transition without deriving a new position from framing bounds.
+
 ## [0.4.0] - 2026-09-12
 
 - Accept injected Pointer Capture sessions; remove the navigation-owned capture adapter and keep legacy composition at the Pointer Capture boundary.
