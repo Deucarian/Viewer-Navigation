@@ -64,7 +64,7 @@ namespace Deucarian.ViewerNavigation
             bool topDownAtEnd,
             CameraMoveOperation operation = null)
         {
-            if (navigationCamera == null || !isActiveAndEnabled || !IsFinite(targetPose.Position))
+            if (navigationCamera == null || !isActiveAndEnabled || !ViewerNavigationPoseValidation.IsFinite(targetPose.Position))
             {
                 return false;
             }
