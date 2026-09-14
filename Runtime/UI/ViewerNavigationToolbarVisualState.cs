@@ -95,7 +95,7 @@ namespace Deucarian.ViewerNavigation.UI
             theme = currentTheme;
             style = currentStyle ??
                     (theme != null ? theme.VisualStyle : null);
-            palette = ViewerNavigationToolbarTheme.ResolvePalette(theme);
+            palette = DeucarianControlIslandTheme.ResolveButtonPalette(theme, host);
             InvalidatePresentation();
             ApplyAll(false);
         }
@@ -257,7 +257,7 @@ namespace Deucarian.ViewerNavigation.UI
                     button.style.scale = new Scale(Vector3.one);
                 }
 
-                float iconScale = interaction.Pressed ? 0.96f : 1f;
+                float iconScale = 1f;
                 ApplyIconScale(primaryIcon, iconScale);
                 ApplyIconScale(secondaryIcon, iconScale);
             }
@@ -318,54 +318,7 @@ namespace Deucarian.ViewerNavigation.UI
         public static DeucarianIconButtonPalette ResolvePalette(
             DeucarianTheme theme)
         {
-            Color normal = Resolve(
-                theme,
-                DeucarianBuiltinColorRoleIds.UiNormal,
-                Color.clear);
-            Color selected = Resolve(
-                theme,
-                DeucarianBuiltinColorRoleIds.Accent,
-                new Color(0.769f, 0.631f, 0.976f, 1f));
-            return new DeucarianIconButtonPalette(
-                normal,
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.UiHighlighted,
-                    new Color(1f, 1f, 1f, 0.12f)),
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.UiPressed,
-                    new Color(1f, 1f, 1f, 0.2f)),
-                selected,
-                normal,
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.TextPrimary,
-                    Color.white),
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.TextMuted,
-                    new Color(0.4f, 0.4f, 0.4f, 1f)),
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.Primary,
-                    Color.white),
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.TextPrimary,
-                    Color.white),
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.TextDisabled,
-                    new Color(0.6f, 0.6f, 0.6f, 1f)),
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.TextMuted,
-                    new Color(0.4f, 0.4f, 0.4f, 1f)),
-                Resolve(
-                    theme,
-                    DeucarianBuiltinColorRoleIds.UiFocused,
-                    selected));
+            return DeucarianControlIslandTheme.ResolveButtonPalette(theme);
         }
 
         public static Color Resolve(

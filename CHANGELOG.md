@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.4 - Unreleased
+
+- Use shared control-island layout and contrast palettes for all navigation controls. Preserve centered icon offsets and fixed pressed geometry.
+
 ## [0.4.3] - 2026-09-14
 
 - Suspend passive orbit updates while a camera transition owns the pose, preserving the original rig state after completion or cancellation. Input cancellation remains live.

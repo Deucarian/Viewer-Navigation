@@ -99,23 +99,9 @@ namespace Deucarian.ViewerNavigation.UI
             toolbar.style.width = width;
             toolbar.style.minWidth = width;
             toolbar.style.maxWidth = width;
-            DeucarianControlIslandStyle.ApplyPanel(
-                toolbar,
-                profile.CreatePanelChrome(width),
-                style);
-
-            Color surface = ViewerNavigationToolbarTheme.Resolve(
-                theme,
-                DeucarianBuiltinColorRoleIds.SurfaceRaised,
-                new Color(0.11f, 0.14f, 0.18f, 0.94f));
-            if (!DeucarianUIToolkitGlassPanel.Apply(
-                    toolbar,
-                    theme,
-                    surface,
-                    style))
-            {
-                toolbar.style.backgroundColor = surface;
-            }
+            DeucarianControlIslandElementStyle.ApplyPanel(
+                toolbar, new DeucarianControlIslandPresentation(theme, style, profile));
+            toolbar.style.minWidth = width;
 
             toolbar.style.scale = new Scale(Vector3.one);
         }
@@ -140,19 +126,8 @@ namespace Deucarian.ViewerNavigation.UI
                     continue;
                 }
 
-                DeucarianControlIslandStyle.ApplyIconButton(
-                    button,
-                    chrome,
-                    style,
-                    profile.VerticalPadding);
-                button.style.visibility = Visibility.Visible;
-                button.style.opacity = 1f;
-                button.style.flexDirection = FlexDirection.Row;
-                button.style.backgroundImage = StyleKeyword.Null;
-                button.style.fontSize = 0f;
-                button.style.whiteSpace = WhiteSpace.NoWrap;
-                button.style.unityTextAlign = TextAnchor.MiddleCenter;
-                button.style.scale = new Scale(Vector3.one);
+                DeucarianControlIslandElementStyle.ApplyIconButtonLayout(
+                    button, chrome, style, profile.VerticalPadding);
             }
         }
 
@@ -184,10 +159,7 @@ namespace Deucarian.ViewerNavigation.UI
                     continue;
                 }
 
-                DeucarianControlIslandStyle.ApplyIcon(icon, chrome, true);
-                icon.style.visibility = Visibility.Visible;
-                icon.style.marginLeft = 0f;
-                icon.style.marginRight = 0f;
+                DeucarianControlIslandElementStyle.ApplyIconLayout(icon, chrome);
                 Texture2D texture = Resources.Load<Texture2D>(resources[i]);
                 icon.style.backgroundImage = texture != null
                     ? new StyleBackground(texture)
