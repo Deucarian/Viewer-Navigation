@@ -18,7 +18,7 @@ components for scene callers.
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.4.3`. Unity `2022.3` or newer is supported.
+Current package version: `0.4.4`. Unity `2022.3` or newer is supported.
 
 For multi-scene applications, create one `PointerCaptureScope` in application
 startup and call `viewer.ConfigurePointerCapture(scope.OpenSession())` before

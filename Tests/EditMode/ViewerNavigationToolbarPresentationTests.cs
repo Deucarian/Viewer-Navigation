@@ -183,7 +183,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(tooltip, Is.Not.Null);
                 Assert.That(
                     tooltip.style.borderTopLeftRadius.value.value,
-                    Is.EqualTo(compactStyle.CornerRadius));
+                    Is.EqualTo(DeucarianControlIslandStyle.ResolveNestedCornerRadius(compactStyle.CornerRadius, compactProfile.VerticalPadding)));
             }
             finally
             {
