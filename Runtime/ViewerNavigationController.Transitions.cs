@@ -12,6 +12,7 @@ namespace Deucarian.ViewerNavigation
         private IEnumerator manualTransition;
         private float manualDeltaTime;
         private CameraMoveOperation activeMoveOperation;
+        private readonly ViewerNavigationTransitionRigOwnership transitionRigOwnership = new ViewerNavigationTransitionRigOwnership();
         public bool UsesManualUpdates { get; private set; }
 
         /// <summary>Use an explicit clock instead of a coroutine; changing clock cancels the current move.</summary>
