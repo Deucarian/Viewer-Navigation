@@ -32,6 +32,8 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(task.Result, Is.EqualTo(Deucarian.CameraNavigation.CameraMoveResult.Completed));
                 Assert.That(controller.IsTransitioning, Is.False);
                 Assert.That(camera.transform.position, Is.EqualTo(Vector3.zero));
+                Assert.That(root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>().enabled,
+                    Is.False, "Completing a transition must preserve an externally disabled rig.");
             }
             finally { Object.DestroyImmediate(root); Object.DestroyImmediate(cameraObject); }
         }
@@ -44,10 +46,12 @@ namespace Deucarian.ViewerNavigation.Tests
             camera.transform.position = new Vector3(0, 3, -12);
             var controller = root.AddComponent<ViewerNavigationController>();
             controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile(1));
-            root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>().enabled = false;
+            var rig = root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>();
+            Assert.IsTrue(rig.enabled);
             controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4), Vector3.zero);
             controller.SetManualUpdates(true);
             controller.NavigateToFace(ViewerViewFace.Right);
+            Assert.IsFalse(rig.enabled, "A camera transition owns the pose until completion or cancellation.");
             var beforeTick = camera.transform.position;
             yield return null; yield return null;
             Assert.AreEqual(beforeTick, camera.transform.position);
@@ -58,6 +62,7 @@ namespace Deucarian.ViewerNavigation.Tests
             Assert.AreEqual(afterTick, camera.transform.position);
             controller.SetManualUpdates(false);
             Assert.IsFalse(controller.IsTransitioning);
+            Assert.IsTrue(rig.enabled);
             Object.Destroy(root);
         }
 

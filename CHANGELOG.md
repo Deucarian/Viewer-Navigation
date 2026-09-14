@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.3] - 2026-09-14
+
+- Suspend passive orbit updates while a camera transition owns the pose, preserving the original rig state after completion or cancellation. Input cancellation remains live.
+
 ## [0.4.2] - Unreleased
 
 - Account for stationary turns and lens changes when timing all camera transitions.

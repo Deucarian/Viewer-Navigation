@@ -245,6 +245,8 @@ namespace Deucarian.ViewerNavigation
         {
             ViewerNavigationSnapshot previous = lastSnapshot;
             lastSnapshot = snapshot;
+            // Suspend passive orbit zoom; the independent input gate can still cancel the move.
+            transitionRigOwnership.Update(navigationRig, snapshot.IsTransitioning);
             StateChanged?.Invoke(snapshot);
             if (previous.Mode != snapshot.Mode)
             {
