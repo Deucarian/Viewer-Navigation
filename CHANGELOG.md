@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.2] - Unreleased
+
+- Account for stationary turns and lens changes when timing all camera transitions.
+- Apply normalized global navigation sensitivity equally to capture restoration, framing and return-to-origin moves.
+
 ## [0.4.1] - 2026-09-13
 
 - Restore authored camera poses through the existing cancellable navigation transition without deriving a new position from framing bounds.
