@@ -94,12 +94,9 @@ namespace Deucarian.ViewerNavigation
                     pivot,
                     startPose.FieldOfView)
                 : targetPose;
-            float distance = Vector3.Distance(
-                animationStartPose.Position,
-                animationTargetPose.Position);
-            float duration = animate && motionProfile != null &&
-                             motionProfile.AnimateTransitions
-                ? motionProfile.CalculateTransitionDuration(distance)
+            float duration = animate && motionProfile != null && motionProfile.AnimateTransitions
+                ? ViewerNavigationTransitionTiming.ResolveDuration(animationStartPose, animationTargetPose,
+                    motionProfile, controls?.GlobalSensitivity ?? DeucarianCameraNavigationControls.DefaultGlobalSensitivity)
                 : 0f;
             uint generation = ++transitionGeneration;
             activeMoveOperation = operation;
