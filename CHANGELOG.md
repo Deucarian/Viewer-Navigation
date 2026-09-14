@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.5 - Unreleased
+
+- Block scene pointer and keyboard input through active transient UI overlays, including menus marked DontSave.
+- Ignore inactive or non-scene documents when checking UI input ownership.
+- Cover transient overlay picking and disable behavior with a runtime regression test.
+
 ## 0.4.4 - Unreleased
 
 - Use shared control-island layout and contrast palettes for all navigation controls. Preserve centered icon offsets and fixed pressed geometry.
