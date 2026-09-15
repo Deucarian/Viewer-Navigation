@@ -39,7 +39,6 @@ namespace Deucarian.ViewerNavigation
     {
         bool AnimateTransitions { get; }
         float TransitionMatchFieldOfView { get; }
-        float CalculateTransitionDuration(float distance);
         float EvaluateMovement(float normalizedTime);
         float EvaluateRotation(float normalizedTime);
     }

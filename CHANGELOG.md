@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0 - Unreleased
+
+- Use one shared 2/3-second duration for every automatic camera move, 50% faster than the previous media focus.
+- Remove per-action durations, distance-based profile timing and automatic-motion sensitivity scaling; manual navigation sensitivity remains independent.
+- Remove obsolete serialized speed and duration limits from presets and samples.
+
 ## 0.5.0 - Unreleased
 
 - Add optional per-action focus durations to pose restoration and bounds framing, independent of target distance.

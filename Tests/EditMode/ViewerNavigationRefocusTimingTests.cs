@@ -10,7 +10,7 @@ namespace Deucarian.ViewerNavigation.Tests
         [TestCase(false, 100f, 10f)]
         [TestCase(true, 0.1f, 20f)]
         [TestCase(true, 100f, 10f)]
-        public void PerActionDurationIsIndependentOfDistanceAndRetainsSensitivity(
+        public void AllActionsUseSharedDurationIndependentOfDistanceAndInputSensitivity(
             bool frameBounds, float distance, float sensitivity)
         {
             var root = new GameObject("Action duration");
@@ -25,32 +25,37 @@ namespace Deucarian.ViewerNavigation.Tests
                 Vector3 position = Vector3.forward * distance;
                 bool accepted = frameBounds
                     ? navigation.TryFrame(new DeucarianCameraFramingTarget(
-                        new Bounds(position, Vector3.one), position), out _, durationSeconds: 1f)
+                        new Bounds(position, Vector3.one), position), out _)
                     : navigation.TryRestorePose(new DeucarianCameraPose(position,
-                        Quaternion.identity, false, 1f, 60f), position, out _, durationSeconds: 1f);
+                        Quaternion.identity, false, 1f, 60f), position, out _);
                 Assert.True(accepted);
-                float duration = 10f / sensitivity;
+                float duration = ViewerNavigationTransitionTiming.DurationSeconds;
                 Advance(navigation, duration * 0.85f);
                 Assert.True(navigation.IsTransitioning, "Short moves must retain the full focus duration.");
                 Advance(navigation, duration * 0.2f);
                 Assert.False(navigation.IsTransitioning, "Long moves must use the same duration.");
 
-                var start = DeucarianCameraPose.Capture(camera);
-                var next = new DeucarianCameraPose(start.Position + Vector3.forward,
-                    start.Rotation, false, 1f, start.FieldOfView);
-                Assert.True(navigation.TryRestorePose(next, next.Position, out _));
-                Advance(navigation, 0.25f * 10f / sensitivity);
-                Assert.False(navigation.IsTransitioning, "An action override must not leak into later navigation.");
+                navigation.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * distance), Vector3.zero);
+                navigation.CaptureOrigin();
+                foreach (System.Func<bool> move in new System.Func<bool>[] {
+                    () => navigation.ReturnToOrigin(), () => navigation.SetTopDown(true),
+                    () => navigation.SetTopDown(false), () => navigation.NavigateToFace(ViewerViewFace.Right),
+                    () => navigation.FrameReference() })
+                {
+                    Assert.True(move());
+                    Advance(navigation, duration * .85f);
+                    Assert.True(navigation.IsTransitioning);
+                    Advance(navigation, duration * .2f);
+                    Assert.False(navigation.IsTransitioning);
+                }
             }
             finally { Object.DestroyImmediate(root); Object.DestroyImmediate(controls); }
         }
 
-        [TestCase(-1f)]
-        [TestCase(float.NaN)]
-        [TestCase(float.PositiveInfinity)]
-        public void InvalidActionDurationDoesNotCancelAnExistingMove(float duration)
+        [Test]
+        public void DisabledAnimationCommitsImmediately()
         {
-            var root = new GameObject("Invalid action duration");
+            var root = new GameObject("Immediate camera action");
             try
             {
                 var camera = root.AddComponent<Camera>();
@@ -59,30 +64,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 navigation.SetManualUpdates(true);
                 var target = new DeucarianCameraPose(Vector3.forward * 10f,
                     Quaternion.identity, false, 1f, 60f);
-                Assert.True(navigation.TryRestorePose(target, Vector3.zero, out _, durationSeconds: 1f));
-                Advance(navigation, 0.2f);
-                Assert.False(navigation.TryRestorePose(target, Vector3.zero, out _, durationSeconds: duration));
-                Assert.True(navigation.IsTransitioning);
-                Advance(navigation, 1f);
-                Assert.That(camera.transform.position, Is.EqualTo(target.Position));
-            }
-            finally { Object.DestroyImmediate(root); }
-        }
-
-        [TestCase(true, 0f)]
-        [TestCase(false, 1f)]
-        public void ZeroDurationOrDisabledAnimationCommitsImmediately(bool animate, float duration)
-        {
-            var root = new GameObject("Immediate action duration");
-            try
-            {
-                var camera = root.AddComponent<Camera>();
-                var navigation = root.AddComponent<ViewerNavigationController>();
-                navigation.Initialize(camera);
-                navigation.SetManualUpdates(true);
-                var target = new DeucarianCameraPose(Vector3.forward * 10f,
-                    Quaternion.identity, false, 1f, 60f);
-                Assert.True(navigation.TryRestorePose(target, Vector3.zero, out _, animate, duration));
+                Assert.True(navigation.TryRestorePose(target, Vector3.zero, out _, false));
                 Assert.False(navigation.IsTransitioning);
                 Assert.That(camera.transform.position, Is.EqualTo(target.Position));
             }
@@ -92,7 +74,7 @@ namespace Deucarian.ViewerNavigation.Tests
         [TestCase(5f)]
         [TestCase(10f)]
         [TestCase(20f)]
-        public void StationaryCaptureTurnAndReturnUseTheSameSensitivity(float sensitivity)
+        public void StationaryCaptureTurnAndReturnUseSharedTiming(float sensitivity)
         {
             var root = new GameObject("Refocus timing");
             var controls = ScriptableObject.CreateInstance<DeucarianCameraNavigationControls>();
@@ -106,7 +88,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.True(navigation.SetGlobalSensitivity(sensitivity));
                 var target = new DeucarianCameraPose(Vector3.zero, Quaternion.Euler(0, 90, 0), false, 1, 60);
                 Assert.That(navigation.TryRestorePose(target, Vector3.forward, out _), Is.True);
-                float duration = 10f / sensitivity;
+                float duration = ViewerNavigationTransitionTiming.DurationSeconds;
                 Advance(navigation, duration * 0.5f);
                 Assert.That(navigation.IsTransitioning, Is.True, "A stationary turn must not snap in the minimum duration.");
                 Assert.That(Quaternion.Angle(camera.transform.rotation, target.Rotation), Is.GreaterThan(1f));
@@ -137,7 +119,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 navigation.TryRestorePose(target, Vector3.forward, out _);
                 Advance(navigation, 0.2f);
                 Assert.That(navigation.IsTransitioning, Is.True);
-                Advance(navigation, 0.4f);
+                Advance(navigation, 0.5f);
                 Assert.That(navigation.IsTransitioning, Is.False);
                 Assert.That(camera.fieldOfView, Is.EqualTo(105f));
             }

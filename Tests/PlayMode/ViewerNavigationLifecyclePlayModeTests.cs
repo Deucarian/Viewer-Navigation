@@ -16,7 +16,7 @@ namespace Deucarian.ViewerNavigation.Tests
             {
                 var camera = cameraObject.AddComponent<Camera>();
                 var controller = root.AddComponent<ViewerNavigationController>();
-                controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile(.5f));
+                controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile());
                 root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>().enabled = false;
                 controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4), Vector3.zero);
                 controller.CaptureOrigin();
@@ -45,7 +45,7 @@ namespace Deucarian.ViewerNavigation.Tests
             var camera = root.AddComponent<Camera>();
             camera.transform.position = new Vector3(0, 3, -12);
             var controller = root.AddComponent<ViewerNavigationController>();
-            controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile(1));
+            controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile());
             var rig = root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>();
             Assert.IsTrue(rig.enabled);
             controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4), Vector3.zero);
@@ -75,7 +75,7 @@ namespace Deucarian.ViewerNavigation.Tests
             {
                 var camera = cameraObject.AddComponent<Camera>();
                 var controller = root.AddComponent<ViewerNavigationController>();
-                controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile(1f));
+                controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile());
                 controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4f), Vector3.zero);
                 controller.CaptureOrigin();
                 camera.transform.position = Vector3.one * 10;
@@ -115,7 +115,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 root.AddComponent<ViewerNavigationController>();
             controller.Initialize(
                 camera,
-                navigationMotionProfile: new TestMotionProfile(0.04f));
+                navigationMotionProfile: new TestMotionProfile());
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
@@ -147,7 +147,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 root.AddComponent<ViewerNavigationController>();
             controller.Initialize(
                 camera,
-                navigationMotionProfile: new TestMotionProfile(1f));
+                navigationMotionProfile: new TestMotionProfile());
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
@@ -173,7 +173,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 root.AddComponent<ViewerNavigationController>();
             controller.Initialize(
                 camera,
-                navigationMotionProfile: new TestMotionProfile(0.08f));
+                navigationMotionProfile: new TestMotionProfile());
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
@@ -206,7 +206,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 root.AddComponent<ViewerNavigationController>();
             controller.Initialize(
                 camera,
-                navigationMotionProfile: new TestMotionProfile(0.5f));
+                navigationMotionProfile: new TestMotionProfile());
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
@@ -229,16 +229,8 @@ namespace Deucarian.ViewerNavigation.Tests
 
         private sealed class TestMotionProfile : IViewerNavigationMotionProfile
         {
-            private readonly float duration;
-
-            public TestMotionProfile(float duration)
-            {
-                this.duration = duration;
-            }
-
             public bool AnimateTransitions => true;
             public float TransitionMatchFieldOfView => 0.1f;
-            public float CalculateTransitionDuration(float distance) => duration;
             public float EvaluateMovement(float normalizedTime) => normalizedTime;
             public float EvaluateRotation(float normalizedTime) => normalizedTime;
         }

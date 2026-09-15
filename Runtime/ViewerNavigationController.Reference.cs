@@ -245,8 +245,7 @@ namespace Deucarian.ViewerNavigation
         public bool TryFrame(
             DeucarianCameraFramingTarget target,
             out string message,
-            bool animate = true,
-            float? durationSeconds = null)
+            bool animate = true)
         {
             if (!DeucarianCameraFraming.TryCreateCurrentProjectionFramePose(
                     target,
@@ -264,8 +263,7 @@ namespace Deucarian.ViewerNavigation
                 target.FocusPoint,
                 ViewerNavigationTransitionKind.Frame,
                 animate,
-                IsTopDown,
-                durationSeconds: durationSeconds);
+                IsTopDown);
             message = accepted ? "Framing accepted." : "Framing was not accepted.";
             return accepted;
         }
