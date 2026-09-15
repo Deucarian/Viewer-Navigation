@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0 - Unreleased
+
+- Add optional per-action focus durations to pose restoration and bounds framing, independent of target distance.
+- Preserve global sensitivity, animation policy, curves and cancellation; existing navigation calls retain their timing.
+
 ## 0.4.5 - Unreleased
 
 - Block scene pointer and keyboard input through active transient UI overlays, including menus marked DontSave.
