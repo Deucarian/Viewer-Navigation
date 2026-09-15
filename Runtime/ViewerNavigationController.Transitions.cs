@@ -63,8 +63,12 @@ namespace Deucarian.ViewerNavigation
             ViewerNavigationTransitionKind kind,
             bool animate,
             bool topDownAtEnd,
-            CameraMoveOperation operation = null)
+            CameraMoveOperation operation = null,
+            float? durationSeconds = null)
         {
+            if (durationSeconds.HasValue && (durationSeconds.Value < 0f ||
+                float.IsNaN(durationSeconds.Value) || float.IsInfinity(durationSeconds.Value)))
+                return false;
             if (navigationCamera == null || !isActiveAndEnabled || !ViewerNavigationPoseValidation.IsFinite(targetPose.Position))
             {
                 return false;
@@ -97,7 +101,8 @@ namespace Deucarian.ViewerNavigation
                 : targetPose;
             float duration = animate && motionProfile != null && motionProfile.AnimateTransitions
                 ? ViewerNavigationTransitionTiming.ResolveDuration(animationStartPose, animationTargetPose,
-                    motionProfile, controls?.GlobalSensitivity ?? DeucarianCameraNavigationControls.DefaultGlobalSensitivity)
+                    motionProfile, controls?.GlobalSensitivity ?? DeucarianCameraNavigationControls.DefaultGlobalSensitivity,
+                    durationSeconds)
                 : 0f;
             uint generation = ++transitionGeneration;
             activeMoveOperation = operation;

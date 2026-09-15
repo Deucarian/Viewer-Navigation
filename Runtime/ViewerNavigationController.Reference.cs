@@ -246,6 +246,15 @@ namespace Deucarian.ViewerNavigation
             DeucarianCameraFramingTarget target,
             out string message,
             bool animate = true)
+            => TryFrameCore(target, out message, animate, null);
+
+        /// <summary>Uses a per-action duration at default sensitivity, preserving navigation policy and curves.</summary>
+        public bool TryFrame(DeucarianCameraFramingTarget target, out string message,
+            float durationSeconds, bool animate = true)
+            => TryFrameCore(target, out message, animate, durationSeconds);
+
+        private bool TryFrameCore(DeucarianCameraFramingTarget target, out string message,
+            bool animate, float? durationSeconds)
         {
             if (!DeucarianCameraFraming.TryCreateCurrentProjectionFramePose(
                     target,
@@ -263,7 +272,8 @@ namespace Deucarian.ViewerNavigation
                 target.FocusPoint,
                 ViewerNavigationTransitionKind.Frame,
                 animate,
-                IsTopDown);
+                IsTopDown,
+                durationSeconds: durationSeconds);
             message = accepted ? "Framing accepted." : "Framing was not accepted.";
             return accepted;
         }

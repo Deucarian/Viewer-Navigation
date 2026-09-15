@@ -18,7 +18,12 @@ components for scene callers.
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.4.5`. Unity `2022.3` or newer is supported.
+Current package version: `0.5.0`. Unity `2022.3` or newer is supported.
+
+`TryRestorePose` and `TryFrame` accept an optional action-specific duration through
+their `durationSeconds` overloads. Seconds are measured at default global sensitivity;
+navigation sensitivity and reduced-motion policy still apply. Existing overloads keep
+distance-based timing. Overrides belong to one action and do not affect later moves.
 
 For multi-scene applications, create one `PointerCaptureScope` in application
 startup and call `viewer.ConfigurePointerCapture(scope.OpenSession())` before

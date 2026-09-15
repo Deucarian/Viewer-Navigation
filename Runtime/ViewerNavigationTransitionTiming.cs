@@ -6,7 +6,7 @@ namespace Deucarian.ViewerNavigation
     internal static class ViewerNavigationTransitionTiming
     {
         internal static float ResolveDuration(DeucarianCameraPose start, DeucarianCameraPose target,
-            IViewerNavigationMotionProfile motionProfile, float sensitivity)
+            IViewerNavigationMotionProfile motionProfile, float sensitivity, float? durationSeconds = null)
         {
             // A stationary camera can still make a large turn or zoom. Express that work
             // in the same profile units used for framing and returning to the origin.
@@ -18,7 +18,7 @@ namespace Deucarian.ViewerNavigation
             float distance = Mathf.Max(Vector3.Distance(start.Position, target.Position), equivalentDistance);
             if (start.Orthographic && target.Orthographic)
                 distance = Mathf.Max(distance, Mathf.Abs(start.OrthographicSize - target.OrthographicSize));
-            return motionProfile.CalculateTransitionDuration(distance) *
+            return (durationSeconds ?? motionProfile.CalculateTransitionDuration(distance)) *
                 DeucarianCameraNavigationControls.DefaultGlobalSensitivity / Mathf.Max(0.01f, sensitivity);
         }
 
