@@ -18,12 +18,15 @@ components for scene callers.
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.5.0`. Unity `2022.3` or newer is supported.
+Current package version: `0.6.0`. Unity `2022.3` or newer is supported.
 
-`TryRestorePose` and `TryFrame` accept an optional action-specific duration through
-their `durationSeconds` parameters. Seconds are measured at default global sensitivity;
-navigation sensitivity and reduced-motion policy still apply. Existing source calls keep
-distance-based timing. Overrides belong to one action and do not affect later moves.
+Every automatic camera move uses `ViewerNavigationTransitionTiming.DurationSeconds`
+(2/3 second): media focus, bounds framing, recenter, top view and view-cube actions.
+Distance and manual input sensitivity do not change this duration. Reduced-motion
+policy and explicit non-animated actions still commit immediately. Version 0.6.0 removes
+the per-action `durationSeconds` arguments, `CalculateTransitionDuration` from motion
+profiles, and the old serialized speed/minimum/maximum settings. Remove these from
+custom callers and assets when upgrading; profiles retain animation policy and easing.
 
 For multi-scene applications, create one `PointerCaptureScope` in application
 startup and call `viewer.ConfigurePointerCapture(scope.OpenSession())` before

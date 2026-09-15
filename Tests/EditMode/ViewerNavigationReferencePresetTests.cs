@@ -20,9 +20,7 @@ namespace Deucarian.ViewerNavigation.Tests
             Assert.That(preset.Controls, Is.Not.Null);
             Assert.That(preset.FramingSettings, Is.Not.Null);
             Assert.That(preset.AnimateTransitions, Is.True);
-            Assert.That(preset.CalculateTransitionDuration(2f), Is.EqualTo(0.1f));
-            Assert.That(preset.CalculateTransitionDuration(10f), Is.EqualTo(0.5f));
-            Assert.That(preset.CalculateTransitionDuration(100f), Is.EqualTo(1.25f));
+
             Assert.That(preset.TransitionMatchFieldOfView, Is.EqualTo(0.1f));
             Assert.That(
                 preset.EvaluateMovement(0.25f),
@@ -191,11 +189,6 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(
                     installer.Controller.MotionProfile.AnimateTransitions,
                     Is.True);
-                Assert.That(
-                    installer.Controller.MotionProfile
-                        .CalculateTransitionDuration(10f),
-                    Is.EqualTo(
-                        composition.Preset.CalculateTransitionDuration(10f)));
             }
             finally
             {
@@ -522,13 +515,9 @@ namespace Deucarian.ViewerNavigation.Tests
                         policy);
 
                 Assert.That(installer.Controller.MotionProfile.AnimateTransitions, Is.False);
-                Assert.That(installer.Controller.MotionProfile.CalculateTransitionDuration(1f), Is.Zero);
 
                 shouldAnimate = true;
                 Assert.That(installer.Controller.MotionProfile.AnimateTransitions, Is.True);
-                Assert.That(
-                    installer.Controller.MotionProfile.CalculateTransitionDuration(1f),
-                    Is.EqualTo(preset.CalculateTransitionDuration(1f)));
             }
             finally
             {
@@ -613,10 +602,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(
                     installer.Controller.MotionProfile.AnimateTransitions,
                     Is.False);
-                Assert.That(
-                    installer.Controller.MotionProfile
-                        .CalculateTransitionDuration(10f),
-                    Is.Zero);
+
                 Assert.That(
                     installer.Controller.MotionProfile
                         .TransitionMatchFieldOfView,
@@ -630,10 +616,6 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(
                     installer.Controller.MotionProfile.AnimateTransitions,
                     Is.True);
-                Assert.That(
-                    installer.Controller.MotionProfile
-                        .CalculateTransitionDuration(10f),
-                    Is.EqualTo(preset.CalculateTransitionDuration(10f)));
             }
             finally
             {

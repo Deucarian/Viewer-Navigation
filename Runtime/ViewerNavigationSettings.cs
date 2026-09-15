@@ -13,9 +13,6 @@ namespace Deucarian.ViewerNavigation
     {
         public const string ReferencePresetResourcesPath =
             "Deucarian/ViewerNavigationReferencePreset";
-        public const float DefaultTransitionSpeed = 20f;
-        public const float DefaultMinimumTransitionDuration = 0.1f;
-        public const float DefaultMaximumTransitionDuration = 1.25f;
         public const float DefaultTransitionMatchFieldOfView = 0.1f;
         public const float DefaultReferencePadding = 1.25f;
 
@@ -26,12 +23,6 @@ namespace Deucarian.ViewerNavigation
 
         [Header("Motion")]
         [SerializeField] private bool animateTransitions = true;
-        [SerializeField, Range(0f, 100f)] private float transitionSpeed =
-            DefaultTransitionSpeed;
-        [SerializeField, Range(0f, 10f)] private float minimumTransitionDuration =
-            DefaultMinimumTransitionDuration;
-        [SerializeField, Range(0f, 10f)] private float maximumTransitionDuration =
-            DefaultMaximumTransitionDuration;
         [SerializeField, Range(0.1f, 30f)] private float transitionMatchFieldOfView =
             DefaultTransitionMatchFieldOfView;
         [SerializeField] private AnimationCurve movementCurve =
@@ -64,19 +55,6 @@ namespace Deucarian.ViewerNavigation
                 ReferencePresetResourcesPath);
         }
 
-        public float CalculateTransitionDuration(float distance)
-        {
-            if (!animateTransitions || transitionSpeed <= 0f)
-            {
-                return 0f;
-            }
-
-            return Mathf.Clamp(
-                Mathf.Max(0f, distance) / transitionSpeed,
-                Mathf.Max(0f, minimumTransitionDuration),
-                Mathf.Max(minimumTransitionDuration, maximumTransitionDuration));
-        }
-
         public float EvaluateMovement(float normalizedTime) =>
             Evaluate(movementCurve, normalizedTime);
 
@@ -96,11 +74,6 @@ namespace Deucarian.ViewerNavigation
 
         private void OnValidate()
         {
-            transitionSpeed = Mathf.Clamp(transitionSpeed, 0f, 100f);
-            minimumTransitionDuration = Mathf.Clamp(minimumTransitionDuration, 0f, 10f);
-            maximumTransitionDuration = Mathf.Max(
-                minimumTransitionDuration,
-                Mathf.Clamp(maximumTransitionDuration, 0f, 10f));
             transitionMatchFieldOfView = Mathf.Clamp(transitionMatchFieldOfView, 0.1f, 30f);
             referencePadding = Mathf.Max(1f, referencePadding);
         }
@@ -112,15 +85,6 @@ namespace Deucarian.ViewerNavigation
         public bool AnimateTransitions => true;
         public float TransitionMatchFieldOfView =>
             ViewerNavigationSettings.DefaultTransitionMatchFieldOfView;
-
-        public float CalculateTransitionDuration(float distance)
-        {
-            return Mathf.Clamp(
-                Mathf.Max(0f, distance) /
-                ViewerNavigationSettings.DefaultTransitionSpeed,
-                ViewerNavigationSettings.DefaultMinimumTransitionDuration,
-                ViewerNavigationSettings.DefaultMaximumTransitionDuration);
-        }
 
         public float EvaluateMovement(float normalizedTime) =>
             Mathf.Clamp01(normalizedTime);
@@ -151,11 +115,6 @@ namespace Deucarian.ViewerNavigation
         public float TransitionMatchFieldOfView => profile != null
             ? profile.TransitionMatchFieldOfView
             : ViewerNavigationSettings.DefaultTransitionMatchFieldOfView;
-
-        public float CalculateTransitionDuration(float distance) =>
-            AnimateTransitions && profile != null
-                ? profile.CalculateTransitionDuration(distance)
-                : 0f;
 
         public float EvaluateMovement(float normalizedTime) =>
             profile != null

@@ -63,7 +63,6 @@ namespace Deucarian.ViewerNavigation.Tests
         {
             public bool AnimateTransitions => true;
             public float TransitionMatchFieldOfView => 0.1f;
-            public float CalculateTransitionDuration(float distance) => 1f;
             public float EvaluateMovement(float time) => time;
             public float EvaluateRotation(float time) => time;
         }

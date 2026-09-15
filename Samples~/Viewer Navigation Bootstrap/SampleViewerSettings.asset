@@ -16,9 +16,6 @@ MonoBehaviour:
   inputSettings: {fileID: 0}
   framingSettings: {fileID: 0}
   animateTransitions: 1
-  transitionSpeed: 20
-  minimumTransitionDuration: 0.1
-  maximumTransitionDuration: 1.25
   transitionMatchFieldOfView: 0.1
   movementCurve:
     serializedVersion: 2
