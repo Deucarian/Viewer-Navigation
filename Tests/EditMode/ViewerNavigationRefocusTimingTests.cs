@@ -25,9 +25,9 @@ namespace Deucarian.ViewerNavigation.Tests
                 Vector3 position = Vector3.forward * distance;
                 bool accepted = frameBounds
                     ? navigation.TryFrame(new DeucarianCameraFramingTarget(
-                        new Bounds(position, Vector3.one), position), out _, 1f)
+                        new Bounds(position, Vector3.one), position), out _, durationSeconds: 1f)
                     : navigation.TryRestorePose(new DeucarianCameraPose(position,
-                        Quaternion.identity, false, 1f, 60f), position, out _, 1f);
+                        Quaternion.identity, false, 1f, 60f), position, out _, durationSeconds: 1f);
                 Assert.True(accepted);
                 float duration = 10f / sensitivity;
                 Advance(navigation, duration * 0.85f);
@@ -59,9 +59,9 @@ namespace Deucarian.ViewerNavigation.Tests
                 navigation.SetManualUpdates(true);
                 var target = new DeucarianCameraPose(Vector3.forward * 10f,
                     Quaternion.identity, false, 1f, 60f);
-                Assert.True(navigation.TryRestorePose(target, Vector3.zero, out _, 1f));
+                Assert.True(navigation.TryRestorePose(target, Vector3.zero, out _, durationSeconds: 1f));
                 Advance(navigation, 0.2f);
-                Assert.False(navigation.TryRestorePose(target, Vector3.zero, out _, duration));
+                Assert.False(navigation.TryRestorePose(target, Vector3.zero, out _, durationSeconds: duration));
                 Assert.True(navigation.IsTransitioning);
                 Advance(navigation, 1f);
                 Assert.That(camera.transform.position, Is.EqualTo(target.Position));
@@ -82,7 +82,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 navigation.SetManualUpdates(true);
                 var target = new DeucarianCameraPose(Vector3.forward * 10f,
                     Quaternion.identity, false, 1f, 60f);
-                Assert.True(navigation.TryRestorePose(target, Vector3.zero, out _, duration, animate));
+                Assert.True(navigation.TryRestorePose(target, Vector3.zero, out _, animate, duration));
                 Assert.False(navigation.IsTransitioning);
                 Assert.That(camera.transform.position, Is.EqualTo(target.Position));
             }

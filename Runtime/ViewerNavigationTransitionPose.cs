@@ -5,6 +5,17 @@ namespace Deucarian.ViewerNavigation
 {
     internal static class ViewerNavigationTransitionPose
     {
+        public static void ResolveAnimationPoses(DeucarianCameraPose start, DeucarianCameraPose target,
+            Vector3 pivot, out DeucarianCameraPose animationStart, out DeucarianCameraPose animationTarget)
+        {
+            animationStart = start.Orthographic && !target.Orthographic
+                ? DeucarianCameraFraming.CreateVisibleTopDownTransitionPose(start, pivot, target.FieldOfView)
+                : start;
+            animationTarget = !start.Orthographic && target.Orthographic
+                ? DeucarianCameraFraming.CreateVisibleTopDownTransitionPose(target, pivot, start.FieldOfView)
+                : target;
+        }
+
         public static void Apply(
             Camera navigationCamera,
             DeucarianCameraPose start,

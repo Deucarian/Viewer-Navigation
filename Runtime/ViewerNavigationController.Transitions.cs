@@ -83,22 +83,10 @@ namespace Deucarian.ViewerNavigation
             }
             DeucarianCameraPose startPose =
                 DeucarianCameraPose.Capture(navigationCamera);
-            bool enteringOrthographic =
-                !startPose.Orthographic && targetPose.Orthographic;
             bool exitingOrthographic =
                 startPose.Orthographic && !targetPose.Orthographic;
-            DeucarianCameraPose animationStartPose = exitingOrthographic
-                ? DeucarianCameraFraming.CreateVisibleTopDownTransitionPose(
-                    startPose,
-                    pivot,
-                    targetPose.FieldOfView)
-                : startPose;
-            DeucarianCameraPose animationTargetPose = enteringOrthographic
-                ? DeucarianCameraFraming.CreateVisibleTopDownTransitionPose(
-                    targetPose,
-                    pivot,
-                    startPose.FieldOfView)
-                : targetPose;
+            ViewerNavigationTransitionPose.ResolveAnimationPoses(startPose, targetPose, pivot,
+                out DeucarianCameraPose animationStartPose, out DeucarianCameraPose animationTargetPose);
             float duration = animate && motionProfile != null && motionProfile.AnimateTransitions
                 ? ViewerNavigationTransitionTiming.ResolveDuration(animationStartPose, animationTargetPose,
                     motionProfile, controls?.GlobalSensitivity ?? DeucarianCameraNavigationControls.DefaultGlobalSensitivity,

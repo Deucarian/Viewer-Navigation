@@ -21,8 +21,8 @@ navigation experience.
 Current package version: `0.5.0`. Unity `2022.3` or newer is supported.
 
 `TryRestorePose` and `TryFrame` accept an optional action-specific duration through
-their `durationSeconds` overloads. Seconds are measured at default global sensitivity;
-navigation sensitivity and reduced-motion policy still apply. Existing overloads keep
+their `durationSeconds` parameters. Seconds are measured at default global sensitivity;
+navigation sensitivity and reduced-motion policy still apply. Existing source calls keep
 distance-based timing. Overrides belong to one action and do not affect later moves.
 
 For multi-scene applications, create one `PointerCaptureScope` in application

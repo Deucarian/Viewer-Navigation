@@ -245,16 +245,8 @@ namespace Deucarian.ViewerNavigation
         public bool TryFrame(
             DeucarianCameraFramingTarget target,
             out string message,
-            bool animate = true)
-            => TryFrameCore(target, out message, animate, null);
-
-        /// <summary>Uses a per-action duration at default sensitivity, preserving navigation policy and curves.</summary>
-        public bool TryFrame(DeucarianCameraFramingTarget target, out string message,
-            float durationSeconds, bool animate = true)
-            => TryFrameCore(target, out message, animate, durationSeconds);
-
-        private bool TryFrameCore(DeucarianCameraFramingTarget target, out string message,
-            bool animate, float? durationSeconds)
+            bool animate = true,
+            float? durationSeconds = null)
         {
             if (!DeucarianCameraFraming.TryCreateCurrentProjectionFramePose(
                     target,

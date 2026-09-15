@@ -8,18 +8,10 @@ namespace Deucarian.ViewerNavigation
         /// <summary>
         /// Restores an authored camera pose through the normal cancellable
         /// navigation transition, without deriving a new position from bounds.
+        /// Optional duration is measured at default global sensitivity.
         /// </summary>
         public bool TryRestorePose(DeucarianCameraPose pose, Vector3 pivot,
-            out string message, bool animate = true)
-            => TryRestorePoseCore(pose, pivot, out message, animate, null);
-
-        /// <summary>Uses a per-action duration at default sensitivity, preserving navigation policy and curves.</summary>
-        public bool TryRestorePose(DeucarianCameraPose pose, Vector3 pivot,
-            out string message, float durationSeconds, bool animate = true)
-            => TryRestorePoseCore(pose, pivot, out message, animate, durationSeconds);
-
-        private bool TryRestorePoseCore(DeucarianCameraPose pose, Vector3 pivot,
-            out string message, bool animate, float? durationSeconds)
+            out string message, bool animate = true, float? durationSeconds = null)
         {
             if (!ViewerNavigationPoseValidation.IsValid(pose, pivot))
             {
