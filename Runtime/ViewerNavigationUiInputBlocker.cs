@@ -17,11 +17,13 @@ namespace Deucarian.ViewerNavigation
                 return true;
             }
 
-            UIDocument[] documents =
-                Object.FindObjectsByType<UIDocument>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            // Transient UI overlays use DontSave and are omitted by FindObjectsByType.
+            UIDocument[] documents = Resources.FindObjectsOfTypeAll<UIDocument>();
             for (int index = 0; index < documents.Length; index++)
             {
-                VisualElement root = documents[index]?.rootVisualElement;
+                UIDocument document = documents[index];
+                if (!IsActiveSceneDocument(document)) continue;
+                VisualElement root = document.rootVisualElement;
                 if (root?.panel == null)
                 {
                     continue;
@@ -51,12 +53,13 @@ namespace Deucarian.ViewerNavigation
                 return true;
             }
 
-            UIDocument[] documents =
-                Object.FindObjectsByType<UIDocument>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            UIDocument[] documents = Resources.FindObjectsOfTypeAll<UIDocument>();
             for (int index = 0; index < documents.Length; index++)
             {
-                VisualElement focusedElement = documents[index]
-                    ?.rootVisualElement
+                UIDocument document = documents[index];
+                if (!IsActiveSceneDocument(document)) continue;
+                VisualElement focusedElement = document
+                    .rootVisualElement
                     ?.panel
                     ?.focusController
                     ?.focusedElement as VisualElement;
@@ -67,6 +70,12 @@ namespace Deucarian.ViewerNavigation
             }
 
             return false;
+        }
+
+        private static bool IsActiveSceneDocument(UIDocument document)
+        {
+            return document != null && document.isActiveAndEnabled &&
+                   document.gameObject.scene.IsValid() && document.gameObject.scene.isLoaded;
         }
 
         internal static Vector2 ToTopLeftScreenPosition(

@@ -1,5 +1,77 @@
 # Changelog
 
+## 0.6.0 - Unreleased
+
+- Use one shared 2/3-second duration for every automatic camera move, 50% faster than the previous media focus.
+- Remove per-action durations, distance-based profile timing and automatic-motion sensitivity scaling; manual navigation sensitivity remains independent.
+- Remove obsolete serialized speed and duration limits from presets and samples.
+
+## 0.5.0 - Unreleased
+
+- Add optional per-action focus durations to pose restoration and bounds framing, independent of target distance.
+- Preserve global sensitivity, animation policy, curves and cancellation; existing navigation calls retain their timing.
+
+## 0.4.5 - Unreleased
+
+- Block scene pointer and keyboard input through active transient UI overlays, including menus marked DontSave.
+- Ignore inactive or non-scene documents when checking UI input ownership.
+- Cover transient overlay picking and disable behavior with a runtime regression test.
+
+## 0.4.4 - Unreleased
+
+- Use shared control-island layout and contrast palettes for all navigation controls. Preserve centered icon offsets and fixed pressed geometry.
+
+## [0.4.3] - 2026-09-14
+
+- Suspend passive orbit updates while a camera transition owns the pose, preserving the original rig state after completion or cancellation. Input cancellation remains live.
+
+## [0.4.2] - Unreleased
+
+- Account for stationary turns and lens changes when timing all camera transitions.
+- Apply normalized global navigation sensitivity equally to capture restoration, framing and return-to-origin moves.
+
+## [0.4.1] - 2026-09-13
+
+- Restore authored camera poses through the existing cancellable navigation transition without deriving a new position from framing bounds.
+
+## [0.4.0] - 2026-09-12
+
+- Accept injected Pointer Capture sessions; remove the navigation-owned capture adapter and keep legacy composition at the Pointer Capture boundary.
+
+## Asset workflow — Unreleased
+
+- Show the bundled reference profile as the effective preview default and retain profile/scene/camera pickers across preview updates.
+
+## [0.3.0] - Unreleased
+
+- Add typed reusable definition authoring and/or scoped Inspector components that share the existing C# service behavior.
+- Include a playable Definition Workflow sample with configured hosts, short callers and usage documentation.
+- Align declared package dependencies with the definition-authoring development wave.
+
+- Render the live preview through Camera Navigation's actual Cube scene; wrap and align all preview toolbar actions.
+- Separate the live preview profile from optional scene setup; preserve the draft profile when choosing a target and disable scene application in Play Mode.
+- Use one Cube in the sample and explicitly declare its URP material dependency.
+- Add a wired ViewerNavigationDemo scene, reference model and editable viewer settings.
+- Fix missing camera-navigation assembly references in the importable sample and document Input System requirements.
+
+
+## [0.2.0] - 2026-09-11
+
+- Remove the importable metadata beside the Unity-ignored `Samples~` root, preventing spurious missing-folder warnings during asset refresh; keep all sample contents and their import metadata.
+- Keep preview zoom baselines aligned when user input interrupts transitions, refresh replaced nested profile dependencies live, and honor input-profile pointer/wheel normalization.
+- Preserve awaitable return operations and typed navigation access alongside manual preview driving, sharing the existing pose/configuration adapters.
+
+- Replace instant illustrative angle/zoom buttons with an isolated interactive preview using the real Viewer Navigation controller and live profile values.
+- Preview Orbit/Fly, smooth wheel zoom, framing/reset, top-down transitions, and optional view-cube actions without Play Mode or global runtime input actions.
+- Keep the navigable scene visible when the view cube is disabled, and release preview input/transitions on page deactivation.
+- Add an explicit manual transition clock; runtime keeps its automatic clock and reduced-motion/instant options.
+- Require Camera Navigation 0.3.0 and shared Editor 1.11.0.
+
+## [0.1.17] - 2026-09-11
+
+- Use native navigation settings and isolated spatial preview with retained selection, configuration and per-page state.
+- Require Editor 1.10.6 for the shared native controls, typography, responsive layouts and accessible interaction states.
+
 ## [0.1.16] - 2026-09-09
 
 ### Changed

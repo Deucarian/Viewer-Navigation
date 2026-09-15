@@ -8,6 +8,89 @@ namespace Deucarian.ViewerNavigation.Tests
     public sealed class ViewerNavigationLifecyclePlayModeTests
     {
         [UnityTest]
+        public IEnumerator AwaitedReturnUsesOnlyTheManualClockAndCompletesItsOwnResult()
+        {
+            var root = new GameObject("manual awaited viewer");
+            var cameraObject = new GameObject("manual awaited viewer camera");
+            try
+            {
+                var camera = cameraObject.AddComponent<Camera>();
+                var controller = root.AddComponent<ViewerNavigationController>();
+                controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile());
+                root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>().enabled = false;
+                controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4), Vector3.zero);
+                controller.CaptureOrigin();
+                camera.transform.position = Vector3.one * 10;
+                controller.SetManualUpdates(true);
+                var task = controller.ReturnToOriginAsync();
+                yield return null; yield return null;
+                Assert.That(camera.transform.position, Is.EqualTo(Vector3.one * 10));
+                Assert.That(task.IsCompleted, Is.False);
+                for (int i = 0; i < 100; i++) controller.Tick(.02f);
+                for (int i = 0; i < 30 && !task.IsCompleted; i++) yield return null;
+                Assert.That(task.IsCompleted, Is.True);
+                Assert.That(task.Result, Is.EqualTo(Deucarian.CameraNavigation.CameraMoveResult.Completed));
+                Assert.That(controller.IsTransitioning, Is.False);
+                Assert.That(camera.transform.position, Is.EqualTo(Vector3.zero));
+                Assert.That(root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>().enabled,
+                    Is.False, "Completing a transition must preserve an externally disabled rig.");
+            }
+            finally { Object.DestroyImmediate(root); Object.DestroyImmediate(cameraObject); }
+        }
+
+        [UnityTest]
+        public IEnumerator ManualClockNeverAlsoAdvancesThroughTheRuntimeCoroutine()
+        {
+            var root = new GameObject("Manually driven navigation");
+            var camera = root.AddComponent<Camera>();
+            camera.transform.position = new Vector3(0, 3, -12);
+            var controller = root.AddComponent<ViewerNavigationController>();
+            controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile());
+            var rig = root.GetComponent<Deucarian.CameraNavigation.InputSystemIntegration.DeucarianInputSystemCameraNavigationRig>();
+            Assert.IsTrue(rig.enabled);
+            controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4), Vector3.zero);
+            controller.SetManualUpdates(true);
+            controller.NavigateToFace(ViewerViewFace.Right);
+            Assert.IsFalse(rig.enabled, "A camera transition owns the pose until completion or cancellation.");
+            var beforeTick = camera.transform.position;
+            yield return null; yield return null;
+            Assert.AreEqual(beforeTick, camera.transform.position);
+            controller.Tick(.1f); controller.Tick(.1f);
+            var afterTick = camera.transform.position;
+            Assert.Greater(Vector3.Distance(beforeTick, afterTick), .001f);
+            yield return null; yield return null;
+            Assert.AreEqual(afterTick, camera.transform.position);
+            controller.SetManualUpdates(false);
+            Assert.IsFalse(controller.IsTransitioning);
+            Assert.IsTrue(rig.enabled);
+            Object.Destroy(root);
+        }
+
+        [UnityTest]
+        public IEnumerator AwaitedReturnCompletesOnDisableAndRejectsMovesWhileDisabled()
+        {
+            var root = new GameObject("awaited navigation");
+            var cameraObject = new GameObject("camera");
+            try
+            {
+                var camera = cameraObject.AddComponent<Camera>();
+                var controller = root.AddComponent<ViewerNavigationController>();
+                controller.Initialize(camera, navigationMotionProfile: new TestMotionProfile());
+                controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 4f), Vector3.zero);
+                controller.CaptureOrigin();
+                camera.transform.position = Vector3.one * 10;
+                var task = controller.ReturnToOriginAsync();
+                Assert.That(task.IsCompleted, Is.False);
+                controller.enabled = false;
+                for (int i = 0; i < 30 && !task.IsCompleted; i++) yield return null;
+                Assert.That(task.IsCompleted, Is.True);
+                Assert.That(task.Result, Is.EqualTo(Deucarian.CameraNavigation.CameraMoveResult.Cancelled));
+                Assert.That(controller.ReturnToOriginAsync().Result, Is.EqualTo(Deucarian.CameraNavigation.CameraMoveResult.InvalidTarget));
+            }
+            finally { Object.DestroyImmediate(root); Object.DestroyImmediate(cameraObject); }
+        }
+
+        [UnityTest]
         public IEnumerator DefaultMotionPreferenceAnimatesDuringPlayMode()
         {
             yield return null;
@@ -32,7 +115,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 root.AddComponent<ViewerNavigationController>();
             controller.Initialize(
                 camera,
-                navigationMotionProfile: new TestMotionProfile(0.04f));
+                navigationMotionProfile: new TestMotionProfile());
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
@@ -64,7 +147,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 root.AddComponent<ViewerNavigationController>();
             controller.Initialize(
                 camera,
-                navigationMotionProfile: new TestMotionProfile(1f));
+                navigationMotionProfile: new TestMotionProfile());
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
@@ -90,7 +173,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 root.AddComponent<ViewerNavigationController>();
             controller.Initialize(
                 camera,
-                navigationMotionProfile: new TestMotionProfile(0.08f));
+                navigationMotionProfile: new TestMotionProfile());
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
@@ -123,7 +206,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 root.AddComponent<ViewerNavigationController>();
             controller.Initialize(
                 camera,
-                navigationMotionProfile: new TestMotionProfile(0.5f));
+                navigationMotionProfile: new TestMotionProfile());
             controller.SetReferenceBounds(
                 new Bounds(Vector3.zero, Vector3.one * 4f),
                 Vector3.zero);
@@ -146,16 +229,8 @@ namespace Deucarian.ViewerNavigation.Tests
 
         private sealed class TestMotionProfile : IViewerNavigationMotionProfile
         {
-            private readonly float duration;
-
-            public TestMotionProfile(float duration)
-            {
-                this.duration = duration;
-            }
-
             public bool AnimateTransitions => true;
             public float TransitionMatchFieldOfView => 0.1f;
-            public float CalculateTransitionDuration(float distance) => duration;
             public float EvaluateMovement(float normalizedTime) => normalizedTime;
             public float EvaluateRotation(float normalizedTime) => normalizedTime;
         }

@@ -1,6 +1,7 @@
 using System.Linq;
 using Deucarian.Editor;
 using NUnit.Framework;
+using UnityEngine.UIElements;
 
 namespace Deucarian.ViewerNavigation.Tests
 {
@@ -8,6 +9,19 @@ namespace Deucarian.ViewerNavigation.Tests
     {
         private const string PackageId =
             "com.deucarian.viewer-navigation";
+
+        [Test]
+        public void ReturningToThePageKeepsRuntimeDetailsExpanded()
+        {
+            Assert.IsTrue(DeucarianToolRegistry.TryGet(DeucarianToolIds.ViewerNavigation, out var tool));
+            using (var page = tool.CreatePage())
+            {
+                var details = page.Root.Query<Foldout>().ToList().Single(f => f.text == "Runtime state"); details.value = true;
+                page.Deactivate(); page.Activate(null);
+                Assert.IsTrue(page.Root.Contains(details));
+                Assert.IsTrue(details.value);
+            }
+        }
 
         [Test]
         public void PackageRegistersStableToolAndCard()

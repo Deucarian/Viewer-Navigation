@@ -34,6 +34,7 @@ namespace Deucarian.ViewerNavigation
         public event Action<bool> TopDownChanged;
 
         public Camera Camera => navigationCamera;
+        public bool IsInitialized => initialized;
         public ViewerNavigationSnapshot Snapshot => state.Snapshot;
         public ViewerNavigationMode Mode => state.Snapshot.Mode;
         public bool IsTopDown => state.Snapshot.IsTopDown;
@@ -74,31 +75,13 @@ namespace Deucarian.ViewerNavigation
 
             Initialize(
                 camera,
-                ResolveControls(configuration),
+                ViewerNavigationConfigurationResolver.ResolveControls(configuration),
                 configuration != null ? configuration.InputSettings : null,
                 motionProfile,
-                ResolveFramingSettings(configuration),
+                ViewerNavigationConfigurationResolver.ResolveFramingSettings(configuration),
                 inputBlocker,
                 navigationReferenceBoundsStrategy);
             settings = configuration;
-        }
-
-        private static DeucarianCameraNavigationControls ResolveControls(
-            ViewerNavigationSettings configuration)
-        {
-            return configuration != null && configuration.Controls != null
-                ? configuration.Controls
-                : Resources.Load<DeucarianCameraNavigationControls>(
-                    DeucarianCameraNavigationControls.CanonicalResourcesPath);
-        }
-
-        private static IDeucarianCameraFramingSettings ResolveFramingSettings(
-            ViewerNavigationSettings configuration)
-        {
-            return configuration != null && configuration.FramingSettings != null
-                ? configuration.FramingSettings
-                : Resources.Load<DeucarianCameraFramingSettings>(
-                    DeucarianCameraFramingSettings.CanonicalResourcesPath);
         }
 
         public void Initialize(
@@ -262,6 +245,8 @@ namespace Deucarian.ViewerNavigation
         {
             ViewerNavigationSnapshot previous = lastSnapshot;
             lastSnapshot = snapshot;
+            // Suspend passive orbit zoom; the independent input gate can still cancel the move.
+            transitionRigOwnership.Update(navigationRig, snapshot.IsTransitioning);
             StateChanged?.Invoke(snapshot);
             if (previous.Mode != snapshot.Mode)
             {

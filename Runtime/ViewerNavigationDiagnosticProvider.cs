@@ -62,9 +62,9 @@ namespace Deucarian.ViewerNavigation
 
             CollectToolbarHealth(section);
 
-            DeucarianPointerCaptureController capture =
+            IPointerCaptureSession capture =
                 controller.InteractionGate != null
-                    ? controller.InteractionGate.PointerCapture
+                    ? controller.InteractionGate.CaptureSession
                     : null;
             if (capture != null)
             {

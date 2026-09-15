@@ -1,6 +1,6 @@
 {
   "name": "com.deucarian.viewer-navigation",
-  "version": "0.1.16",
+  "version": "0.6.0",
   "displayName": "Deucarian Viewer Navigation Experience",
   "description": "Reusable viewer navigation experience composing camera navigation, Input System controls, pointer capture, UI, theming, logging, and diagnostics.",
   "unity": "2022.3",
@@ -21,23 +21,29 @@
     "fly"
   ],
   "dependencies": {
-    "com.deucarian.camera-navigation": "0.2.12",
+    "com.deucarian.camera-navigation": "0.4.0",
     "com.deucarian.camera-navigation.input-system-integration": "0.1.7",
     "com.deucarian.common": "0.2.1",
     "com.deucarian.diagnostics": "0.1.6",
-    "com.deucarian.editor": "1.7.0",
+    "com.deucarian.editor": "1.13.0",
     "com.deucarian.logging": "1.0.4",
-    "com.deucarian.pointer-capture": "0.1.4",
-    "com.deucarian.theming": "1.1.2",
-    "com.deucarian.ui": "0.2.7",
+    "com.deucarian.pointer-capture": "0.2.0",
+    "com.deucarian.theming": "1.8.0",
+    "com.deucarian.ui": "0.5.0",
     "com.unity.ugui": "1.0.0",
-    "com.unity.modules.uielements": "1.0.0"
+    "com.unity.modules.uielements": "1.0.0",
+    "com.unity.render-pipelines.universal": "14.0.12"
   },
   "samples": [
     {
       "displayName": "Viewer Navigation Bootstrap",
       "description": "Explicit composition-root example with a reference model and the canonical package-owned icon toolbar; the optional six-face view cube is disabled by default.",
       "path": "Samples~/Viewer Navigation Bootstrap"
+    },
+    {
+      "displayName": "Definition Workflow",
+      "description": "Playable scene with typed C# calls, Inspector components, editable definitions and shared host ownership.",
+      "path": "Samples~/DefinitionWorkflow"
     }
   ]
 }

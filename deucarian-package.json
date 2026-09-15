@@ -13,7 +13,8 @@
     "Deucarian.ViewerNavigation.Editor"
   ],
   "sampleAssemblies": [
-    "Deucarian.ViewerNavigation.Samples.Bootstrap"
+    "Deucarian.ViewerNavigation.Samples.Bootstrap",
+    "Deucarian.ViewerNavigation.Samples.DefinitionWorkflow"
   ],
   "testAssemblies": [
     "Deucarian.ViewerNavigation.Tests.EditMode",
@@ -30,7 +31,8 @@
     "com.deucarian.theming",
     "com.deucarian.ui",
     "com.unity.modules.uielements",
-    "com.unity.ugui"
+    "com.unity.ugui",
+    "com.unity.render-pipelines.universal"
   ],
   "optionalVersionDefinedDependencies": [],
   "allowedDirectDebugCalls": [],

@@ -1,10 +1,39 @@
 # Deucarian Viewer Navigation Experience
 
+## Asset selection and project defaults
+
+The preview profile starts with the bundled reference preset until you select another profile. Choose includes project and package assets; Create/Customize makes an editable project copy. Scene object and Camera remain explicit scene selections rather than guessing objects. Profile changes update the preview; applying a setup to scene objects remains a separate action.
+
+## Typed definition workflow
+
+Mode selection is an enum shared by C# and the Inspector. The existing viewer controller remains the only navigation state owner.
+
+Start with the [Definition Workflow walkthrough](Documentation~/DefinitionWorkflow.md).
+Import **Definition Workflow** in Package Manager for a configured sample scene
+and short caller scripts. The sample keeps typed contracts and service setup explicit, with reusable
+components for scene callers.
+
+
 `com.deucarian.viewer-navigation` composes the existing Deucarian camera, Input System,
 pointer-capture, UI, theming, logging, and diagnostics packages into a canonical viewer
 navigation experience.
 
-Current package version: `0.1.16`. Unity `2022.3` or newer is supported.
+Current package version: `0.6.0`. Unity `2022.3` or newer is supported.
+
+Every automatic camera move uses `ViewerNavigationTransitionTiming.DurationSeconds`
+(2/3 second): media focus, bounds framing, recenter, top view and view-cube actions.
+Distance and manual input sensitivity do not change this duration. Reduced-motion
+policy and explicit non-animated actions still commit immediately. Version 0.6.0 removes
+the per-action `durationSeconds` arguments, `CalculateTransitionDuration` from motion
+profiles, and the old serialized speed/minimum/maximum settings. Remove these from
+custom callers and assets when upgrading; profiles retain animation policy and easing.
+
+For multi-scene applications, create one `PointerCaptureScope` in application
+startup and call `viewer.ConfigurePointerCapture(scope.OpenSession())` before
+`Initialize`. Navigation disposes only its borrowed session on destruction; the
+application disposes the scope on shutdown. Existing callers remain supported
+through Pointer Capture's documented scene-scoped compatibility adapter. The
+Definition Workflow sample demonstrates the explicit composition route.
 
 It owns the authoritative Orbit/Fly/top-down state, cancellable camera transitions,
 reference bounds and pivot wiring, origin capture, UI input blocking, a navigation
@@ -129,6 +158,34 @@ It intentionally contains no Report Viewer, Activity Viewer, browser, or backend
 Open **Deucarian Control Center > Experience > Viewer Navigation** to inspect or install the scene-level
 composition component. The editor surface uses `com.deucarian.editor`.
 
+The embedded preview is interactive in Edit Mode and uses the actual
+`ViewerNavigationController`, its motion profile, and Camera Navigation's Orbit/Fly
+controllers. Drag to look/orbit, Shift-drag or middle-drag to pan, and scroll to
+zoom. Click the preview before using WASD and Q/E; Escape or focus loss releases
+input. Orbit, Fly, Top, Frame, Reset, and the optional view cube drive the same
+camera actions as runtime. Wheel zoom damps between events and framing/reset
+transition from the current pose instead of jumping. Toolbar/view-cube toggles
+apply immediately; disabling the view cube does not hide the navigable scene.
+
+Choose a project-owned profile to tune it. Without one, the preview uses the
+packaged reference preset without modifying it. Current motion-curve and controls
+values are read live. The camera lives in a disposable preview scene; scene
+objects and runtime input actions remain untouched. **Apply to scene** is a
+separate, explicit Undo-aware action.
+
+Pointer sensitivity and wheel normalization follow the profile's live input
+settings. The focused editor gestures described above are not a simulation of
+custom runtime key/button bindings. Replacing a profile's controls, framing, or
+input asset refreshes the existing preview; presentation-only edits do not
+interrupt a move. Starting a gesture during framing cancels at the current pose
+without resuming an old zoom target.
+
+`ViewerNavigationController.SetManualUpdates(true)` allows a deterministic host
+to advance transitions with `Tick(deltaTime)` instead of a coroutine. This is how
+the preview runs outside Play Mode. Only one clock runs at a time, and changing
+clock cancels the active move. Normal runtime defaults still animate automatically;
+explicit instant moves and the reduced-motion policy remain supported.
+
 ## Diagnostics
 
 Each initialized controller registers a provider with `com.deucarian.diagnostics` and
@@ -156,3 +213,15 @@ requests and pushes to `develop` and `main`.
 ## License
 
 Released under the MIT License. See `LICENSE.md`.
+
+## Simple typed usage
+
+See [Simple usage](Documentation~/SimpleUsage.md) for the short caller, Inspector selections and one-time scoped setup.
+
+## Preview versus scene setup
+
+The editor preview renders a real Unity Cube. `Preview profile` changes its live controls and motion values. The wrapping toolbar and view cube operate only on that isolated preview.
+
+`Apply to a scene` is separate: assign an Installer object, Scene camera and your profile, then apply with Undo. Choosing a scene object does not replace the preview profile. Scene application is disabled in Play Mode.
+
+The importable `ViewerNavigationDemo.unity` scene uses one Cube and the runtime toolbar. Its material requires URP (declared by this package); assign a URP asset in Graphics Settings and check Quality overrides. The Input System integration keeps Active Input Handling set to Both, with a one-time editor restart needed if native input was disabled.
