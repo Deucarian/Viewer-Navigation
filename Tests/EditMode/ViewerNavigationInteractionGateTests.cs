@@ -254,6 +254,7 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(capture.RequestCount, Is.EqualTo(1));
                 Assert.That(started, Is.Zero);
                 Assert.That(gate.IsPointerInputBlocked(Vector2.one), Is.True);
+                Assert.That(gate.IsPointerGestureStartBlocked(Vector2.one), Is.True);
 
                 source.SetCaptureAction(
                     DeucarianMouseButton.Middle,
@@ -273,11 +274,13 @@ namespace Deucarian.ViewerNavigation.Tests
                 Assert.That(capture.State, Is.EqualTo(
                     DeucarianPointerCaptureState.Requested));
                 Assert.That(gate.IsPointerInputBlocked(Vector2.one), Is.True);
+                Assert.That(gate.IsPointerGestureStartBlocked(Vector2.one), Is.False);
 
                 capture.RaiseState(DeucarianPointerCaptureState.Active);
 
                 Assert.That(started, Is.EqualTo(1));
                 Assert.That(gate.IsPointerInputBlocked(Vector2.one), Is.False);
+                Assert.That(gate.IsPointerGestureStartBlocked(Vector2.one), Is.False);
             }
             finally
             {

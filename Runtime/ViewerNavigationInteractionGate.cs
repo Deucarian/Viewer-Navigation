@@ -12,7 +12,8 @@ namespace Deucarian.ViewerNavigation
     [DisallowMultipleComponent]
     public sealed class ViewerNavigationInteractionGate :
         MonoBehaviour,
-        IDeucarianNavigationInputBlocker
+        IDeucarianNavigationInputBlocker,
+        IDeucarianNavigationGestureStartBlocker
     {
         private readonly List<VisualElement> uiRoots = new List<VisualElement>();
         private IPointerCaptureSession pointerCaptureSession;
@@ -112,6 +113,18 @@ namespace Deucarian.ViewerNavigation
             }
 
             return IsPointerBlockedByApplication(screenPosition);
+        }
+
+        public bool IsPointerGestureStartBlocked(Vector2 screenPosition)
+        {
+            if (ownsCapture &&
+                pointerCaptureSession != null &&
+                IsOwnedCaptureState(pointerCaptureSession.State))
+            {
+                return false;
+            }
+
+            return IsPointerInputBlocked(screenPosition);
         }
 
         private bool IsPointerBlockedByApplication(Vector2 screenPosition)
