@@ -130,6 +130,8 @@ namespace Deucarian.ViewerNavigation
             }
 
             CancelTransition();
+            if (Mode == ViewerNavigationMode.Fly && mode == ViewerNavigationMode.Orbit && !IsTopDown)
+                navigationRig?.SelectOrbitPivotFromView();
             state.SetMode(mode);
             ApplyNavigationMode();
             ViewerNavigationLog.Navigation.Info(
