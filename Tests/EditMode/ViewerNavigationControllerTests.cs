@@ -1,4 +1,5 @@
 using Deucarian.CameraNavigation;
+using Deucarian.CameraNavigation.InputSystemIntegration;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -118,6 +119,46 @@ namespace Deucarian.ViewerNavigation.Tests
                 afterOrigin.OrthographicSize,
                 Is.EqualTo(beforeOrigin.OrthographicSize));
             Assert.That(afterOrigin.FieldOfView, Is.EqualTo(beforeOrigin.FieldOfView));
+        }
+
+        [Test]
+        public void ReturningFromFlyKeepsTheViewAndOrbitsAroundItsNewFocus()
+        {
+            controller.SetReferenceBounds(new Bounds(Vector3.zero, Vector3.one * 10f), Vector3.zero);
+            controller.SetNavigationMode(ViewerNavigationMode.Fly);
+            camera.transform.SetPositionAndRotation(new Vector3(30f, 12f, -40f), Quaternion.Euler(15f, 65f, 0f));
+            Vector3 position = camera.transform.position;
+            Quaternion rotation = camera.transform.rotation;
+            var rig = root.GetComponent<DeucarianInputSystemCameraNavigationRig>();
+
+            Assert.That(controller.SetNavigationMode(ViewerNavigationMode.Orbit), Is.True);
+            Assert.That(camera.transform.position, Is.EqualTo(position));
+            Assert.That(camera.transform.rotation, Is.EqualTo(rotation));
+            Assert.That(Vector3.Angle(controller.Pivot - position, camera.transform.forward), Is.LessThan(0.01f));
+            Assert.That(controller.Pivot, Is.Not.EqualTo(Vector3.zero));
+            Vector3 pivot = controller.Pivot;
+            float distance = rig.GetOrbitDistance();
+            rig.ApplyOrbitFrame(DeucarianOrbitInputSystemFrame.None, 1f / 60f);
+            Assert.That(Vector3.Distance(camera.transform.position, position), Is.LessThan(0.001f));
+            rig.ApplyOrbitFrame(new DeucarianOrbitInputSystemFrame(
+                new DeucarianOrbitCameraInput(new Vector2(0.02f, 0f), Vector2.zero, 0f, false), false, Vector2.zero), 1f / 60f);
+            Assert.That(Quaternion.Angle(rotation, camera.transform.rotation), Is.LessThan(1f));
+            Assert.That(rig.GetOrbitDistance(), Is.EqualTo(distance).Within(0.001f));
+            Assert.That(controller.Pivot, Is.EqualTo(pivot));
+        }
+
+        [Test]
+        public void SwitchingModeInTopDownPreservesTheTopDownPivot()
+        {
+            controller.SetReferenceBounds(new Bounds(Vector3.one * 5f, Vector3.one * 10f), Vector3.one * 5f);
+            controller.SetNavigationMode(ViewerNavigationMode.Fly);
+            controller.SetTopDown(true, false);
+            Vector3 pivot = controller.Pivot;
+            Vector3 position = camera.transform.position;
+            controller.SetNavigationMode(ViewerNavigationMode.Orbit);
+            Assert.That(controller.Pivot, Is.EqualTo(pivot));
+            Assert.That(camera.transform.position, Is.EqualTo(position));
+            Assert.That(camera.orthographic, Is.True);
         }
 
         [Test]
